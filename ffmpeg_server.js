@@ -13,7 +13,8 @@ var temp_folder = './temp/';
 var completed_folder = './completed/';
 var transcoder_port = 911;
 var public_port = 912;
-
+var hostname = '192.168.0.128'; //This will allow the transcoding server to run publicly
+//var hostname = '127.0.0.1'; //This will allow the transcoding server to run locally only
 http.createServer(function(req, res) {
 	if (req.url == '/upload' && req.method.toLowerCase() == 'post') {
 		var form = new formidable.IncomingForm();
@@ -61,7 +62,7 @@ http.createServer(function(req, res) {
 		'<input type="submit" value="Upload">'+
 		'</form>'
 	);
-}).listen(transcoder_port);
+}).listen(transcoder_port,hostname);
 function queueHandler() {
 	if(processing >= max_processing ){
 		console.log('max processors already allocated');
