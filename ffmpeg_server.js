@@ -1,12 +1,12 @@
-var formidable = require('formidable'),
-	http = require('http'),
-	connect = require('connect'),
-	util = require('util'),
-	fs = require('fs'),
-	sqlite3 = require('sqlite3').verbose(),
-	db = new sqlite3.Database('./db.sqlite'),
-	url = require('url'),
-	exec = require('child_process').exec;
+var formidable = require('formidable'),//For form handling
+	http = require('http'), //For creating http server required by connect framework
+	connect = require('connect'), //For creating the server for serving static files as well as status of the server
+	util = require('util'), //Inspecting elements for debugging and showing server status
+	fs = require('fs'), //For moving files around and handling uploads
+	sqlite3 = require('sqlite3').verbose(), //For storing the current state of the server(files in queue and currently processing and the files encoded)
+	db = new sqlite3.Database('./db.sqlite'), //Open a database named db.sqlite or create it if not exist
+	url = require('url'), //For parsing the request url
+	exec = require('child_process').exec; //For calling the ffmpeg command and tracking its execution
 var queue = new Array(),
 	completed = new Array(),
 	current = new Array();
@@ -15,9 +15,9 @@ var max_processing = 4;
 var queued_folder = './queued/';
 var temp_folder = './temp/';
 var completed_folder = './completed/';
-var transcoder_port = 911;
-//var host_ip = '192.168.0.128'; //This will allow the transcoding server to run publicly
-var host_ip = '127.0.0.1'; //This will allow the transcoding server to run locally only
+var transcoder_port = 1203;
+//var host_ip = '192.168.0.129'; //This will allow the transcoding server to run publicly
+//var host_ip = '127.0.0.1'; //This will allow the transcoding server to run locally only
 function queueHandler() {
 	if(processing >= max_processing ){
 		console.log('max processors already allocated');
@@ -93,7 +93,7 @@ function queueHandler() {
 	}
 }
 
-/*
+/**
  * Initializing the database table if not exist.
  * Status Codes:
  * 0:	File has been successfully recieved
@@ -104,6 +104,8 @@ function queueHandler() {
  * 5:	The file was removed by the server
  * 6:	There was an error in uploading
  * 7:	There was an error moving the transcoded file
+ * 8:	The file type is not supported
+ * 9:	The file was encoded but the callback failed
  * 
  **/
 db.serialize(function() {
@@ -115,6 +117,23 @@ function update_transaction_status(vid,status){
 	var stmt = db.prepare("UPDATE transactions SET status = ? WHERE transaction_id = ?");
 	stmt.run(status,vid.id);
 	return vid;
+}
+
+// function to encode file data to base64 encoded string
+function base64_encode(file) {
+    // read binary data
+    var bitmap = fs.readFileSync(file);
+    // convert binary data to base64 encoded string
+    return new Buffer(bitmap).toString('base64');
+}
+
+// function to create file from base64 encoded string
+function base64_decode(base64str, file) {
+    // create buffer object from base64 encoded string, it is important to tell the constructor that the string is base64 encoded
+    var bitmap = new Buffer(base64str, 'base64');
+    // write buffer to file
+    fs.writeFileSync(file, bitmap);
+    console.log('******** File created from base64 encoded string ********');
 }
 
 function insert_transaction(filename,status,callback_url){
@@ -156,6 +175,11 @@ connect()
 			var form = new formidable.IncomingForm();
 			form.parse(req, function(err, fields, files) {
 				res.writeHead(200, {'content-type': 'text/plain'});
+				if(typeof(files.upload)=='undefined'){
+					console.log('Upload file not found in the request');
+					res.end('Upload file not found');
+					return;
+				}
 				res.write('received upload:\n\n');
 				if(files.upload.name){
 					console.log('file '+files.upload.name + ' uploaded');
@@ -171,6 +195,10 @@ connect()
 						newname = tempname + counter.toString();
 						counter++;
 					}
+					
+					/**
+					 * Moving the temp file to the queued folder
+					 **/
 					exec('mv '+ files.upload.path + ' ' + queued_folder + newname + '.' + ext, function (error,stdout,stderr){
 						console.log('stdout: ' + stdout);
 						console.log('stderr: ' + stderr);
@@ -196,6 +224,10 @@ connect()
 			});
 			return;
 		}
+		
+		/**
+		 * This block is to show the status of the queue on the frontend
+		 **/
 		if (req.url == '/status'||req.url == '/status/'){
 			res.writeHead(200, {'content-type': 'text/plain'});
 			res.write('\n\nRemaining Queue \n\n'+util.inspect(queue));
@@ -206,6 +238,10 @@ connect()
 			res.end();
 			return;
 		}
+		
+		/**
+		 * This block will show the upload form with callback url to be opened when the transcoding is complete
+		 **/
 		if(req.url == '/' ){
 			res.writeHead(200, {'content-type': 'text/html'});
 			res.end(
@@ -217,7 +253,10 @@ connect()
 			);
 			return;
 		}
-		//Case when nothing matches gives 404 error message
+		
+		/**
+		 * Case when nothing matches gives 404 error message
+		 **/
 		res.writeHead(404, {"content-type": "text/html"});
 		res.end('The URL you are looking for is DEAD');
-	}).listen(transcoder_port,host_ip);
+	}).listen(transcoder_port);
