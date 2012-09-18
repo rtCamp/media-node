@@ -47,6 +47,18 @@ for (arg in server_args){
 	}
 }
 
+function checkAndCreateDirectory(foldername){
+	fs.existsSync(foldername, function (exists) {
+		if(!exists){
+			fs.mkdirSync(foldername);
+		}
+	});
+}
+
+checkAndCreateDirectory(queued_folder);
+checkAndCreateDirectory(temp_folder);
+checkAndCreateDirectory(completed_folder);
+
 console.log('Starting FFMPEG Server on '+transcoder_ip+':'+transcoder_port);
 function queueHandler() {
 	if(processing >= max_processing ){
