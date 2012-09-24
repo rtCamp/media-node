@@ -60,11 +60,11 @@ fi
 clear
 if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
-	echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
+	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
 	sudo apt-get -y remove ffmpeg x264 libx264-dev yasm liblame-dev
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
-	echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
+	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
 	sudo apt-get -y remove ffmpeg x264 libav-tools libvpx-dev libx264-dev
 fi
 
@@ -72,7 +72,7 @@ fi
 # Update The Dependencies
 clear
 echo -e "\033[34m Updating Dependencies... \e[0m"
-#sudo apt-get update
+sudo apt-get update
 
 
 #Install The Packages
@@ -152,29 +152,30 @@ then
 fi
 
 
-# Install H.264 (x286) Video Encoder
+# Install H.264 (x264) Video Encoder
 clear
 cd $MNDIR
-echo -e "\033[34m Cloning x286 Repo... \e[0m"
+echo -e "\033[34m Cloning x264 Repo... \e[0m"
 git clone --depth 1 git://git.videolan.org/x264
-cd x286
+cd x264
 ./configure --enable-static
 make
 if [ $Version = Ubuntu804 ]
 then
 	# Ubuntu 8.04
-	echo -e "\033[34m Configure x286 For $Version \e[0m"
+	echo -e "\033[34m Configure x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --pkgversion="2:0.svn$(date +%Y%m%d)-0.0ubuntu1" \
 	--backup=no --deldoc=yes --default
 elif [ $Version = Ubuntu1004 ]
 then
 	#Ubuntu 10.04
-	echo -e "\033[34m Configure x286 For $Version \e[0m"
+	echo -e "\033[34m Configure x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --default --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+then
 	# Ubuntu 10.10 11.04 11.10 12.04 
-	echo -e "\033[34m Configure x286 For $Version \e[0m"
+	echo -e "\033[34m Configure x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
 	--fstrans=no --default
