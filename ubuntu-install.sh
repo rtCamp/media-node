@@ -10,7 +10,6 @@
 
 # Check The Target System Is Desktop/Server
 DesktopDetect=$(dpkg --list | grep ubuntu-desktop)
-echo $DesktopDetect
 
 # Check The Target System Version
 cat /etc/lsb-release | grep 8.04  &> /dev/null
@@ -46,6 +45,13 @@ then
 	Version=Ubuntu1204
 fi
 
+# Tell Users About Detetcted Desktop & Version
+if [ $DesktopDetect -eq 0 ]
+then
+	echo "$Version Desktop Detected..."
+else
+	echo "$Version Server Detected..."
+fi
 
 
 # Remove Any Existing Packages
@@ -94,7 +100,6 @@ then
 	then
 
 		# Ubuntu10.10 11.04 11.10 12.04  Desktop
-		echo "Ubuntu Desktop Detected..."
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 		librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
@@ -102,14 +107,11 @@ then
 	else
 
 		# Ubuntu10.10 11.04 11.10 12.04 Servers
-		echo "Ubuntu Server Detected..."
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev librtmp-dev libtheora-dev \
 		libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev
 	fi
 fi
-
-
 
 
 # Making Directory For Cloning Encoders
@@ -138,9 +140,17 @@ git clone --depth 1 git://git.videolan.org/x264
 cd x286
 ./configure --enable-static
 make
-sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
+if [ $Version = Ubuntu804 ]
+then
+	# Ubuntu 8.04
+	sudo checkinstall --pkgname=x264 --pkgversion="2:0.svn$(date +%Y%m%d)-0.0ubuntu1" \
+	--backup=no --deldoc=yes --default
+else
+	# Ubuntu 10.04 10.10 11.04 11.10 12.04 
+	sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
 	--fstrans=no --default
+fi
 
 
 # Install LAME MP3 Audio Encoder
@@ -159,6 +169,7 @@ then
 	--deldoc=yes --fstrans=no --default
 fi
 
+
 # Install libtheora Video Encoder
 # Libtheora Is Recommended For Ubuntu8.04
 if [ $Version = Ubuntu804 ]
@@ -173,6 +184,7 @@ then
 	sudo checkinstall --pkgname=libtheora --pkgversion="1.1.1" --backup=no \
 	--deldoc=yes --fstrans=no --default
 fi
+
 
 # Install AAC (fdk-aac) Audio Encoder
 # AAC Is Recommended For Ubuntu 10.10/11.04/11.10/12.04
@@ -263,5 +275,6 @@ then
 	sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(date +%Y%m%d%H%M)-git" --backup=no \
 	--deldoc=yes --fstrans=no --default
 fi
+
 
 hash x264 ffmpeg ffplay ffprobe
