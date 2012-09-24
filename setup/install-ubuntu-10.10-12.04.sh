@@ -1,38 +1,45 @@
 #!/bin/bash
 
+# A word about this shell script:
+# This shell script install the ffmpeg node and npm on the Ubuntu System.
 
+# Reference: https://ffmpeg.org/trac/ffmpeg/wiki/UbuntuCompilationGuide
+		
 
-#Remove any existing packages
+# Remove any existing packages
 sudo apt-get remove ffmpeg x264 libav-tools libvpx-dev libx264-dev
 
-#Update the dependencies
+# Update the dependencies
 sudo apt-get update
 
-#Check if target system is desktop or server
+# Check if target system is desktop or server
 OSDETECT=$(dpkg --list | grep ubuntu-desktop)
+echo $OSDETECT
 
 if [ $OSDETECT -eq 0 ]
 then
 
-	#Ubuntu Desktop
+	# Ubuntu Desktop
+	echo "Ubuntu Desktop Detected..."
 	sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 	libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 	librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
 	libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev
 else
 
-	#Ubuntu Servers
+	# Ubuntu Servers
+	echo "Ubuntu Server Detected..."
 	sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 	libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev librtmp-dev libtheora-dev \
 	libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev
 fi
 
-#Making directory for cloning encoders
+# Making directory for cloning encoders
 MNDIR=$HOME/media-node
 mkdir $MNDIR
+echo $MNDIR
 
-
-#Install H.264 (x286) video encoder.
+# Install H.264 (x286) video encoder.
 cd $MNDIR
 git clone --depth 1 git://git.videolan.org/x264
 cd x286
@@ -42,7 +49,8 @@ sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
 	--fstrans=no --default
 
-#Install AAC (fdk-aac) audio encoder.
+
+# Install AAC (fdk-aac) audio encoder.
 cd $MNDIR
 git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git
 cd fdk-aac
@@ -52,7 +60,8 @@ make
 sudo checkinstall --pkgname=fdk-aac --pkgversion="$(date +%Y%m%d%H%M)-git" --backup=no \
 	--deldoc=yes --fstrans=no --default
 
-#Install VP8 (libvpx) video encoder and decoder.
+
+# Install VP8 (libvpx) video encoder and decoder.
 cd $MNDIR
 git clone --depth 1 http://git.chromium.org/webm/libvpx.git
 cd libvpx
@@ -62,19 +71,19 @@ sudo checkinstall --pkgname=libvpx --pkgversion="1:$(date +%Y%m%d%H%M)-git" --ba
 	--deldoc=yes --fstrans=no --default
 
 
-#Install FFmpeg
+# Install FFmpeg
 cd $MNDIR
 git clone --depth 1 git://source.ffmpeg.org/ffmpeg
 cd ffmpeg
 if [ $OSDETECT -eq 0 ]
 then
-	#Ubuntu Desktop
+	# Ubuntu Desktop
 	./configure --enable-gpl --enable-libfaac --enable-libfdk-aac --enable-libmp3lame \
 	--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-librtmp --enable-libtheora \
 	--enable-libvorbis --enable-libvpx --enable-x11grab --enable-libx264 --enable-nonfree \
 	--enable-version3
 else
-	#Ubuntu Server
+	# Ubuntu Server
 	./configure --enable-gpl --enable-libfaac --enable-libfdk-aac --enable-libmp3lame \
 	--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-librtmp --enable-libtheora \
 	--enable-libvorbis --enable-libvpx --enable-libx264 --enable-nonfree \
