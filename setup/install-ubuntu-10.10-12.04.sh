@@ -38,8 +38,9 @@ git clone --depth 1 git://git.videolan.org/x264
 cd x286
 ./configure --enable-static
 make
-sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes --fstrans=no --default
-
+sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
+	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
+	--fstrans=no --default
 
 #Install AAC (fdk-aac) audio encoder.
 cd $MNDIR
@@ -48,8 +49,8 @@ cd fdk-aac
 autoreconf -fiv
 ./configure --disable-shared
 make
-sudo checkinstall --pkgname=fdk-aac --pkgversion="$(date +%Y%m%d%H%M)-git" --backup=no --deldoc=yes --fstrans=no --default
-
+sudo checkinstall --pkgname=fdk-aac --pkgversion="$(date +%Y%m%d%H%M)-git" --backup=no \
+	--deldoc=yes --fstrans=no --default
 
 #Install VP8 (libvpx) video encoder and decoder.
 cd $MNDIR
@@ -57,7 +58,8 @@ git clone --depth 1 http://git.chromium.org/webm/libvpx.git
 cd libvpx
 ./configure
 make
-sudo checkinstall --pkgname=libvpx --pkgversion="1:$(date +%Y%m%d%H%M)-git" --backup=no --deldoc=yes --fstrans=no --default
+sudo checkinstall --pkgname=libvpx --pkgversion="1:$(date +%Y%m%d%H%M)-git" --backup=no \
+	--deldoc=yes --fstrans=no --default
 
 
 #Install FFmpeg
@@ -79,7 +81,7 @@ else
 	--enable-version3
 fi
 make
-sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(date +%Y%m%d%H%M)-git" --backup=no --deldoc=yes --fstrans=no --default
-
+sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(date +%Y%m%d%H%M)-git" --backup=no \
+	--deldoc=yes --fstrans=no --default
 
 hash x264 ffmpeg ffplay ffprobe
