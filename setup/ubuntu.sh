@@ -88,9 +88,9 @@ then
 		nasm libogg-dev
 	else
 		# Ubuntu8.04 Server
-		 echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
+		echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
 		sudo apt-get -y install build-essential git-core checkinstall texi2html libfaac-dev \
-		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev
+		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev libsdl1.2-dev
 	fi
 elif [ $Version = Ubuntu1004 ]
 then
@@ -105,7 +105,7 @@ then
 		# Ubuntu10.04  Server
 		echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
 		sudo apt-get install -y build-essential git-core checkinstall texi2html libfaac-dev \
-		libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev pkg-config zlib1g-dev nasm
+		libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev pkg-config zlib1g-dev nasm libsdl1.2-dev
 	fi
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
@@ -124,7 +124,7 @@ then
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev librtmp-dev libtheora-dev \
-		libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev
+		libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev libsdl1.2-dev
 	fi
 fi
 
@@ -317,5 +317,7 @@ then
 	--deldoc=yes --fstrans=no --default
 fi
 
-
+# Adding Entry In Hash Table
+clear
+echo -e "\033[34m Updating Hash Table... \e[0m"
 hash x264 ffmpeg ffplay ffprobe
