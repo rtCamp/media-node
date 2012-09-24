@@ -55,10 +55,10 @@ fi
 
 
 # Remove Any Existing Packages
-if [ $Version = Ubuntu804 || $Version = Ubuntu1004 ]
+if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
 	sudo apt-get remove ffmpeg x264 libx264-dev yasm
-elif [ $Version = Ubuntu1010 || $Version = Ubuntu1104 || $Version = Ubuntu1110 || $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	sudo apt-get remove ffmpeg x264 libav-tools libvpx-dev libx264-dev
 fi
@@ -94,7 +94,7 @@ then
 		sudo apt-get install -y build-essential git-core checkinstall texi2html libfaac-dev \
 		libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev pkg-config zlib1g-dev
 	fi
-elif [ $Version = Ubuntu1010 || $Version = Ubuntu1104 || $Version = Ubuntu1110 || $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	if [ $DesktopDetect -eq 0 ]
 	then
@@ -122,7 +122,7 @@ echo $MNDIR
 
 # Install Yasm Assembler
 # Yasm Is Recommended For x264 & FFmpeg In Ubuntu8.04/ 10.04
-if [ $Version = Ubuntu804 || $Version = Ubuntu1004 ]
+if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
 	cd $MNDIR
 	wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
@@ -155,7 +155,7 @@ fi
 
 # Install LAME MP3 Audio Encoder
 # LAME Is Recommended For Ubuntu8.04/ 10.04
-if [ $Version = Ubuntu804 || $Version = Ubuntu1004 ]
+if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
 	cd $MNDIR
 	sudo apt-get -y remove liblame-dev
@@ -188,7 +188,7 @@ fi
 
 # Install AAC (fdk-aac) Audio Encoder
 # AAC Is Recommended For Ubuntu 10.10/11.04/11.10/12.04
-if [ $Version = Ubuntu1010 || $Version = Ubuntu1104 || $Version = Ubuntu1110 || $Version = Ubuntu1204 ]
+if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	cd $MNDIR
 	git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git
@@ -254,7 +254,7 @@ then
 	sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(./version.sh)" --backup=no \
 	--deldoc=yes --default
 
-elif [ $Version = Ubuntu1010 || $Version = Ubuntu1104 || $Version = Ubuntu1110 || $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	if [ $DesktopDetect -eq 0 ]
 	then
