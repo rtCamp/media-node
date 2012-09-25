@@ -80,10 +80,14 @@ fi
 
 # Remove Any Existing Packages
 clear
-if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
+if [ $Version = Ubuntu804 ]
 then
 	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
 	sudo apt-get -y remove ffmpeg x264 libx264-dev yasm liblame-dev
+elif [ $Version = Ubuntu1004 ]
+then
+	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
+	sudo apt-get -y remove ffmpeg x264 libx264-dev yasm libmp3lame-dev
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
@@ -107,13 +111,13 @@ then
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install build-essential git-core checkinstall texi2html libfaac-dev \
 		libsdl1.2-dev libvorbis-dev libx11-dev libxext-dev libxfixes-dev pkg-config zlib1g-dev \
-		nasm libogg-dev \
+		nasm libogg-dev curl \
 		|| OwnError "$Version Desktop Installation Failed :("
 	else
 		# Ubuntu8.04 Server
 		echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
 		sudo apt-get -y install build-essential git-core checkinstall texi2html libfaac-dev \
-		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev libsdl1.2-dev \
+		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev curl libsdl1.2-dev \
 		|| OwnError "$Version Server Installation Failed :("
 	fi
 elif [ $Version = Ubuntu1004 ]
