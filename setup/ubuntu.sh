@@ -381,7 +381,7 @@ clear
 cd $MNDIR
 echo -e "\033[34m Downloading Node... \e[0m"
 wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz || OwnError "Unable To Fetch Node :("
-tar -zxvf http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz
+tar -zxvf node-v0.8.9.tar.gz
 cd node-v0.8.9
 ./configure || OwnError "Unable To Configure Node :("
 make
