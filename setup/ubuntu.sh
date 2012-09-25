@@ -8,6 +8,16 @@
 #	5. Ubuntu 11.10 Desktop/Server
 #	6. Ubuntu 12.04 Desktop/Server
 
+# Capture Errors
+OwnError()
+{
+	#echo $@ >&2
+	clear
+	echo -e "\033[31m$@ \e[0m"
+	exit 100
+}
+
+
 # Check The Target System Is Desktop/Server
 dpkg --list | grep ubuntu-desktop &> /dev/null
 DesktopDetect=$(echo $?)
@@ -72,7 +82,7 @@ fi
 # Update The Dependencies
 clear
 echo -e "\033[34m Updating Dependencies... \e[0m"
-sudo apt-get update
+sudo apt-get update || OwnError "Dependencies Update Failed :("
 
 
 #Install The Packages
@@ -85,12 +95,14 @@ then
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install build-essential git-core checkinstall texi2html libfaac-dev \
 		libsdl1.2-dev libvorbis-dev libx11-dev libxext-dev libxfixes-dev pkg-config zlib1g-dev \
-		nasm libogg-dev
+		nasm libogg-dev \
+		|| OwnError "$Version Desktop Installation Failed :("
 	else
 		# Ubuntu8.04 Server
 		echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
 		sudo apt-get -y install build-essential git-core checkinstall texi2html libfaac-dev \
-		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev libsdl1.2-dev
+		libvorbis-dev pkg-config zlib1g-dev nasm libogg-dev libsdl1.2-dev \
+		|| OwnError "$Version Server Installation Failed :("
 	fi
 elif [ $Version = Ubuntu1004 ]
 then
@@ -100,12 +112,15 @@ then
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get install -y build-essential git-core checkinstall texi2html libfaac-dev \
 		libopencore-amrnb-dev libopencore-amrwb-dev libsdl1.2-dev libtheora-dev \
-		libvorbis-dev libx11-dev libxfixes-dev pkg-config zlib1g-dev nasm
+		libvorbis-dev libx11-dev libxfixes-dev pkg-config zlib1g-dev nasm \
+		|| OwnError "$Version Desktop Installation Failed :("
 	else
 		# Ubuntu10.04  Server
 		echo -e "\033[34m  Installing Packages For $Version Server \e[0m"
 		sudo apt-get install -y build-essential git-core checkinstall texi2html libfaac-dev \
-		libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev pkg-config zlib1g-dev nasm libsdl1.2-dev
+		libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev pkg-config zlib1g-dev \
+		nasm libsdl1.2-dev \
+		|| OwnError "$Version Server Installation Failed :("
 	fi
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
@@ -117,14 +132,16 @@ then
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 		librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
-		libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev
+		libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev \
+		|| OwnError "$Version Desktop Installation Failed :("
 	else
 
 		# Ubuntu10.10 11.04 11.10 12.04 Servers
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev librtmp-dev libtheora-dev \
-		libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev libsdl1.2-dev
+		libtool libvorbis-dev pkg-config texi2html yasm zlib1g-dev libsdl1.2-dev \
+		|| OwnError "$Version Server Installation Failed :("
 	fi
 fi
 
@@ -132,7 +149,7 @@ fi
 # Making Directory For Cloning Encoders
 clear
 MNDIR=$(cd ..; pwd)
-mkdir $MNDIR
+mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
 echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
 
@@ -143,12 +160,13 @@ then
 	clear
 	cd $MNDIR
 	echo -e "\033[34m Downloading/Installing Yasm... \e[0m"
-	wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
+	wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz || OwnError "Unable To Fetch YASM :("
 	tar zxvf yasm-1.2.0.tar.gz
 	cd yasm-1.2.0
-	./configure
+	./configure || OwnError "Unable To Configure YASM :("
 	make
-	sudo checkinstall --pkgname=yasm --pkgversion="1.2.0" --backup=no --deldoc=yes --default
+	sudo checkinstall --pkgname=yasm --pkgversion="1.2.0" --backup=no --deldoc=yes --default \
+	|| OwnError "Unable To Install YASM For $Version :("
 fi
 
 
@@ -156,29 +174,32 @@ fi
 clear
 cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
-git clone --depth 1 git://git.videolan.org/x264
+git clone --depth 1 git://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository:("
 cd x264
-./configure --enable-static
+./configure --enable-static || OwnError "Unable To Configure x264 :("
 make
 if [ $Version = Ubuntu804 ]
 then
 	# Ubuntu 8.04
-	echo -e "\033[34m Configure x264 For $Version \e[0m"
+	echo -e "\033[34m Installing x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --pkgversion="2:0.svn$(date +%Y%m%d)-0.0ubuntu1" \
-	--backup=no --deldoc=yes --default
+	--backup=no --deldoc=yes --default \
+	|| OwnError "Unable To Install x264 For $Version :("
 elif [ $Version = Ubuntu1004 ]
 then
 	#Ubuntu 10.04
-	echo -e "\033[34m Configure x264 For $Version \e[0m"
+	echo -e "\033[34m Installing x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --default --pkgversion="3:$(./version.sh | \
-	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes
+	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
+	|| OwnError "Unable To Install x264 For $Version :("
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	# Ubuntu 10.10 11.04 11.10 12.04 
-	echo -e "\033[34m Configure x264 For $Version \e[0m"
+	echo -e "\033[34m Installing x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
-	--fstrans=no --default
+	--fstrans=no --default \
+	|| OwnError "Unable To Install x264 For $Version :("
 fi
 
 
@@ -192,13 +213,14 @@ then
 	# Added liblame-dev & nasm To Above Common Remove/Install Block
 	# sudo apt-get -y remove liblame-dev
 	# sudo apt-get -y install nasm
-	wget -c http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz
+	wget -c http://downloads.sourceforge.net/project/lame/lame/3.99/lame-3.99.5.tar.gz || OwnError "Unable To Fetch LAME :("
 	tar zxvf lame-3.99.5.tar.gz
 	cd lame-3.99.5
-	./configure --enable-nasm --disable-shared
+	./configure --enable-nasm --disable-shared || OwnError "Unable To Configure LAME :("
 	make
 	sudo checkinstall --pkgname=lame-ffmpeg --pkgversion="3.99.5" --backup=no \
-	--deldoc=yes --fstrans=no --default
+	--deldoc=yes --fstrans=no --default \
+	|| OwnError "Unable To Install LAME For $Version :("
 fi
 
 
@@ -211,13 +233,14 @@ then
 	echo -e "\033[34m  Downloading Libtheora... \e[0m"
 	# Added libogg-dev To Above Common Install Block
 	# sudo apt-get -y install libogg-dev
-	wget -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.gz
+	wget -c http://downloads.xiph.org/releases/theora/libtheora-1.1.1.tar.gz || OwnError "Unable To Fetch Libtheora :("
 	tar zxvf libtheora-1.1.1.tar.gz
 	cd libtheora-1.1.1
-	./configure --disable-shared
+	./configure --disable-shared || OwnError "Unable To Configure Libtheora :("
 	make
 	sudo checkinstall --pkgname=libtheora --pkgversion="1.1.1" --backup=no \
-	--deldoc=yes --fstrans=no --default
+	--deldoc=yes --fstrans=no --default \
+	|| OwnError "Unable To Install Lintheora For $Version :("
 fi
 
 
@@ -228,13 +251,14 @@ then
 	clear
 	cd $MNDIR
 	echo -e "\033[34m  Cloning FDK-AAC Repo... \e[0m"
-	git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git
+	git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git || OwnError "Unable To Clonning AAC Repository:("
 	cd fdk-aac
 	autoreconf -fiv
-	./configure --disable-shared
+	./configure --disable-shared || OwnError "Unable To Configure AAC :("
 	make
 	sudo checkinstall --pkgname=fdk-aac --pkgversion="$(date +%Y%m%d%H%M)-git" --backup=no \
-	--deldoc=yes --fstrans=no --default
+	--deldoc=yes --fstrans=no --default \
+	|| OwnError "Unable To Install AAC For $Version :("
 fi
 
 
@@ -242,19 +266,20 @@ fi
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
-git clone --depth 1 http://git.chromium.org/webm/libvpx.git
+git clone --depth 1 http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository:("
 cd libvpx
-./configure
+./configure || OwnError "Unable To Configure VP8 :("
 make
 sudo checkinstall --pkgname=libvpx --pkgversion="1:$(date +%Y%m%d%H%M)-git" --backup=no \
-	--deldoc=yes --fstrans=no --default
+	--deldoc=yes --fstrans=no --default \
+	|| OwnError "Unable To Install VP8 For $Version :("
 
 
 # Install FFmpeg
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
-git clone --depth 1 git://source.ffmpeg.org/ffmpeg
+git clone --depth 1 git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository:("
 cd ffmpeg
 
 if [ $Version = Ubuntu804 ]
@@ -264,17 +289,20 @@ then
 		#Ubuntu8.04 Desktop
 		./configure --enable-gpl --enable-version3 --enable-nonfree --enable-libfaac \
 		--enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libvpx \
-		--enable-libx264 --enable-x11grab
+		--enable-libx264 --enable-x11grab \
+		|| OwnError "Unable To Configure FFmpeg For $Version Desktop :("
 	else
 		#Ubuntu8.04 Server
 		./configure --enable-gpl --enable-version3 --enable-nonfree --enable-libfaac \
 		--enable-libmp3lame --enable-libtheora --enable-libvorbis --enable-libvpx \
-		--enable-libx264
+		--enable-libx264 \
+		|| OwnError "Unable To Configure FFmpeg For $Version Server :("
 	fi
 
 	make
 	sudo checkinstall --pkgname=ffmpeg --pkgversion="4:git-$(date +%Y%m%d)" --backup=no \
-	--deldoc=yes --default
+	--deldoc=yes --default \
+	|| OwnError "Unable To Install FFmpeg For $Version :("
 
 elif [ $Version = Ubuntu1004 ]
 then
@@ -283,17 +311,20 @@ then
 		#Ubuntu 10.04 Desktop
 		./configure --enable-gpl --enable-libfaac --enable-libmp3lame --enable-libopencore-amrnb \
 		--enable-libopencore-amrwb --enable-libtheora --enable-libvorbis --enable-libvpx \
-		--enable-libx264 --enable-nonfree --enable-version3 --enable-x11grab
+		--enable-libx264 --enable-nonfree --enable-version3 --enable-x11grab \
+		|| OwnError "Unable To Configure FFmpeg For $Version Desktop :("
 	else
 		#Ubuntu10.04 Server
 		./configure --enable-gpl --enable-libfaac --enable-libmp3lame --enable-libopencore-amrnb \
 		--enable-libopencore-amrwb --enable-libtheora --enable-libvorbis --enable-libvpx \
-		--enable-libx264 --enable-nonfree --enable-version3
+		--enable-libx264 --enable-nonfree --enable-version3 \
+		|| OwnError "Unable To Configure FFmpeg For $Version Server :("
 	fi
 
 	make
 	sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(./version.sh)" --backup=no \
-	--deldoc=yes --default
+	--deldoc=yes --default \
+	|| OwnError "Unable To Install FFmpeg For $Version :("
 
 elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
@@ -303,24 +334,27 @@ then
 		./configure --enable-gpl --enable-libfaac --enable-libfdk-aac --enable-libmp3lame \
 		--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-librtmp --enable-libtheora \
 		--enable-libvorbis --enable-libvpx --enable-x11grab --enable-libx264 --enable-nonfree \
-		--enable-version3
+		--enable-version3 \
+		|| OwnError "Unable To Configure FFmpeg For $Version Desktop :("
 	else
 		# Ubuntu Server
 		./configure --enable-gpl --enable-libfaac --enable-libfdk-aac --enable-libmp3lame \
 		--enable-libopencore-amrnb --enable-libopencore-amrwb --enable-librtmp --enable-libtheora \
 		--enable-libvorbis --enable-libvpx --enable-libx264 --enable-nonfree \
-		--enable-version3
+		--enable-version3 \
+		|| OwnError "Unable To Configure FFmpeg For $Version Server :("
 	fi
 
 	make
 	sudo checkinstall --pkgname=ffmpeg --pkgversion="5:$(date +%Y%m%d%H%M)-git" --backup=no \
-	--deldoc=yes --fstrans=no --default
+	--deldoc=yes --fstrans=no --default \
+	|| OwnError "Unable To Install FFmpeg For $Version :("
 fi
 
 # Adding Entry In Hash Table
 clear
 echo -e "\033[34m Updating Hash Table... \e[0m"
-hash x264 ffmpeg ffplay ffprobe
+hash x264 ffmpeg ffplay ffprobe || OwnError "Unable To Update Hash Table :("
 
 
 
@@ -328,38 +362,38 @@ hash x264 ffmpeg ffplay ffprobe
 clear
 cd $MNDIR
 echo -e "\033[34m Downloading Node... \e[0m"
-wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz
+wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz || OwnError "Unable To Fetch Node :("
 tar -zxvf http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz
 cd node-v0.8.9
-./configure
+./configure || OwnError "Unable To Configure Node :("
 make
-make install
+make install || OwnError "Unable To Install Node:("
 
 # Check Node Is Installed
 echo -e "\033[34m Node Version... \e[0m"
-node --version
+node --version || OwnError "Node Is Not Properly Installed :("
 
 
 # Install NPM (Node Package Manager)
 clear
 cd $MNDIR
 echo -e "\033[34m Installing NPM (Node Package Manager)... \e[0m"
-curl https://npmjs.org/install.sh | sudo sh
+curl https://npmjs.org/install.sh | sudo sh || OwnError "Unable To Fetch & Install NPM :("
 
 # Check NPM IS Installed
 echo -e "\033[34m NPM Version... \e[0m"
-npm -v
+npm -v || OwnError "NPM Is Not Properly Installed :("
 
 
 # Clonning The Media-Node Repository
 clear
 cd $MNDIR
-echo -e "\033[34m Clonning Media Node Repository... \e[0m"
-git clone git://github.com/rtCamp/media-node.git
-cd media-node
+#echo -e "\033[34m Clonning Media Node Repository... \e[0m"
+#git clone git://github.com/rtCamp/media-node.git
+#cd media-node
 echo -e "\033[34m Installing Formidable Node Module... \e[0m"
-npm install formidable
+npm install formidable || OwnError "Unable To Install Formidable Node Module :("
 echo -e "\033[34m Installing Connect Node Module... \e[0m"
-npm install connect
+npm install connect || OwnError "Unable To Install Connect Node Module :("
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
-npm install sqlite3
+npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
