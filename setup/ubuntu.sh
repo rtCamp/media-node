@@ -288,7 +288,12 @@ fi
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
-git clone --depth 1 http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository:("
+if [ $Version = Ubuntu804 ]
+then
+	git clone http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
+elif [ $Version = Ubuntu 1004 ] || [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+	git clone --depth 1 http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
+fi
 cd libvpx
 ./configure || OwnError "Unable To Configure VP8 :("
 make
