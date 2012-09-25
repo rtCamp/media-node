@@ -167,8 +167,8 @@ then
 else
 	MNDIR=$(pwd)
 fi
-mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
-echo -e "\033[34m Directory: $MNDIR Created \e[0m"
+#mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
+#echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
 
 # Install Yasm Assembler
