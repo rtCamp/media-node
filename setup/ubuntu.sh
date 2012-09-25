@@ -131,9 +131,9 @@ fi
 
 # Making Directory For Cloning Encoders
 clear
-MNSDIR=$HOME/media-node-setup
-mkdir $MNSDIR
-echo -e "\033[34m Directory: $MNSDIR Created \e[0m"
+MNDIR=$(cd ..; pwd)
+mkdir $MNDIR
+echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
 
 # Install Yasm Assembler
@@ -141,7 +141,7 @@ echo -e "\033[34m Directory: $MNSDIR Created \e[0m"
 if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
 	clear
-	cd $MNSDIR
+	cd $MNDIR
 	echo -e "\033[34m Downloading/Installing Yasm... \e[0m"
 	wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz
 	tar zxvf yasm-1.2.0.tar.gz
@@ -154,7 +154,7 @@ fi
 
 # Install H.264 (x264) Video Encoder
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
 git clone --depth 1 git://git.videolan.org/x264
 cd x264
@@ -187,7 +187,7 @@ fi
 if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
 then
 	clear
-	cd $MNSDIR
+	cd $MNDIR
 	echo -e "\033[34m  Downloading LAME... \e[0m"
 	# Added liblame-dev & nasm To Above Common Remove/Install Block
 	# sudo apt-get -y remove liblame-dev
@@ -207,7 +207,7 @@ fi
 if [ $Version = Ubuntu804 ]
 then
 	clear
-	cd $MNSDIR
+	cd $MNDIR
 	echo -e "\033[34m  Downloading Libtheora... \e[0m"
 	# Added libogg-dev To Above Common Install Block
 	# sudo apt-get -y install libogg-dev
@@ -226,7 +226,7 @@ fi
 if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
 	clear
-	cd $MNSDIR
+	cd $MNDIR
 	echo -e "\033[34m  Cloning FDK-AAC Repo... \e[0m"
 	git clone --depth 1 git://github.com/mstorsjo/fdk-aac.git
 	cd fdk-aac
@@ -240,7 +240,7 @@ fi
 
 # Install VP8 (libvpx) Video Encoder/Decoder
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
 git clone --depth 1 http://git.chromium.org/webm/libvpx.git
 cd libvpx
@@ -252,7 +252,7 @@ sudo checkinstall --pkgname=libvpx --pkgversion="1:$(date +%Y%m%d%H%M)-git" --ba
 
 # Install FFmpeg
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
 git clone --depth 1 git://source.ffmpeg.org/ffmpeg
 cd ffmpeg
@@ -326,7 +326,7 @@ hash x264 ffmpeg ffplay ffprobe
 
 # Install Node
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m Downloading Node... \e[0m"
 wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz
 tar -zxvf http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz
@@ -342,7 +342,7 @@ node --version
 
 # Install NPM (Node Package Manager)
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m Installing NPM (Node Package Manager)... \e[0m"
 curl https://npmjs.org/install.sh | sudo sh
 
@@ -353,7 +353,7 @@ npm -v
 
 # Clonning The Media-Node Repository
 clear
-cd $MNSDIR
+cd $MNDIR
 echo -e "\033[34m Clonning Media Node Repository... \e[0m"
 git clone git://github.com/rtCamp/media-node.git
 cd media-node
