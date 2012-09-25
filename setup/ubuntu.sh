@@ -292,6 +292,7 @@ if [ $Version = Ubuntu804 ]
 then
 	git clone http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
 elif [ $Version = Ubuntu 1004 ] || [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+then
 	git clone --depth 1 http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
 fi
 cd libvpx
