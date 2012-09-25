@@ -8,6 +8,18 @@
 #	5. Ubuntu 11.10 Desktop/Server
 #	6. Ubuntu 12.04 Desktop/Server
 
+
+# Checking Permissions
+Permission=$(id -u)
+#echo $Permission
+if [ $Permission -ne 0 ] 
+then
+        echo -e "\033[34m Super User Privilege Required... \e[0m"
+        echo -e "\033[34m Uses:  sudo $0 \e[0m"
+        exit 100 
+fi
+
+
 # Capture Errors
 OwnError()
 {
