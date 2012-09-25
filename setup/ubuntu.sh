@@ -148,7 +148,13 @@ fi
 
 # Making Directory For Cloning Encoders
 clear
-MNDIR=$(cd ..; pwd)
+pwd | grep setup &> /dev/null
+if [ $? -eq 0 ]
+then
+	MNDIR=$(cd ..; pwd)
+else
+	MNDIR=$(pwd)
+fi
 mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
 echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
