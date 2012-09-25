@@ -14,8 +14,8 @@ Permission=$(id -u)
 #echo $Permission
 if [ $Permission -ne 0 ] 
 then
-        echo -e "\033[34m Super User Privilege Required... \e[0m"
-        echo -e "\033[34m Uses:  sudo $0 \e[0m"
+        echo -e "\033[31m Super User Privilege Required... \e[0m"
+        echo -e "\033[31m Uses:  sudo $0 \e[0m"
         exit 100 
 fi
 
