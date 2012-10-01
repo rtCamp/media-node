@@ -425,3 +425,10 @@ echo -e "\033[34m Installing Connect Node Module... \e[0m"
 npm install connect || OwnError "Unable To Install Connect Node Module :("
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
 npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
+
+
+# Adding Crontab Entry
+echo "@reboot	node $MNDIR/ffmpeg_server.js &> $MNDIR/ffmpeg_server.log" >> /var/spool/cron/crontabs || OwnError "Unable To Install Crontabs :("
+node $MNDIR/ffmpeg_server.js &> $MNDIR/ffmpeg_server.log || OwnError "Unable To Start Node :("
+
+
