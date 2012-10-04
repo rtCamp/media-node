@@ -94,6 +94,19 @@ then
 	sudo apt-get -y remove ffmpeg x264 libav-tools libvpx-dev libx264-dev
 fi
 
+if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+then
+	cat /etc/apt/sources.list | grep multiverse &> /dev/null
+	if [ $? -eq 0 ]
+	then
+		echo -e "\033[34m Already Multiverse Reporitory Enabled... \e[0m"
+	else
+		echo "deb http://archive.ubuntu.com/ubuntu/ precise multiverse" >> /etc/apt/sources.list \
+		|| OwnError "Ubable To Add Multiverse Repository :("
+		echo "deb http://archive.ubuntu.com/ubuntu/ precise-updates multiverse" >> /etc/apt/sources.list \
+		|| OwnError "Ubable To Add Multiverse Repository :("
+	fi
+fi
 
 # Update The Dependencies
 clear
