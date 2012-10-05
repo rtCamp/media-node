@@ -177,13 +177,21 @@ fi
 
 # Making Directory For Cloning Encoders
 clear
-pwd | grep setup &> /dev/null
-if [ $? -eq 0 ]
+if [ -d ~root/media-node ]
 then
-	MNDIR=$(cd ..; pwd)
+	MNDIR=~root/media-node/
 else
-	MNDIR=$(pwd)
+	mkdir ~root/media-node/
+	MNDIR=~root/media-node/
 fi
+
+#pwd | grep setup &> /dev/null
+#if [ $? -eq 0 ]
+#then
+#	MNDIR=$(cd ..; pwd)
+#else
+#	MNDIR=$(pwd)
+#fi
 #mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
 #echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
@@ -441,5 +449,5 @@ npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
 
 
 # Adding Crontab Entry
-echo "@reboot	node $MNDIR/ffmpeg_server.js &> $MNDIR/ffmpeg_server.log" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
-node $MNDIR/ffmpeg_server.js &> $MNDIR/ffmpeg_server.log  &
+echo "@reboot	cd $MNDIR && node ffmpeg_server.js &> ffmpeg_server.log &" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
+cd $MNDIR && node ffmpeg_server.js &> ffmpeg_server.log &
