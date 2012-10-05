@@ -9,6 +9,20 @@
 #	6. Ubuntu 12.04 Desktop/Server
 
 
+pwd | grep setup &> /dev/null
+if [ $? -eq 0 ]
+then
+	BASEDIR=$(cd ..; pwd)
+else
+	BASEDIR=$(pwd)
+fi
+echo $BASEDIR
+exit 0;
+#mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
+#echo -e "\033[34m Directory: $MNDIR Created \e[0m"
+
+
+
 # Checking Permissions
 Permission=$(id -u)
 #echo $Permission
@@ -181,19 +195,10 @@ if [ -d ~root/media-node ]
 then
 	MNDIR=~root/media-node/
 else
-	mkdir ~root/media-node/
+	mkdir ~root/media-node/ || OwnError "Unable To Create ~root/media-node :("
 	MNDIR=~root/media-node/
 fi
 
-#pwd | grep setup &> /dev/null
-#if [ $? -eq 0 ]
-#then
-#	MNDIR=$(cd ..; pwd)
-#else
-#	MNDIR=$(pwd)
-#fi
-#mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
-#echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
 
 # Install Yasm Assembler
@@ -447,7 +452,11 @@ npm install connect || OwnError "Unable To Install Connect Node Module :("
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
 npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
 
+# Copy Media Node Files
+clear
+cd $MNDIR
+cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files :("
 
 # Adding Crontab Entry
-echo "@reboot	cd $MNDIR && node ffmpeg_server.js &> ffmpeg_server.log &" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
-cd $MNDIR && node ffmpeg_server.js &> ffmpeg_server.log &
+echo "@reboot	cd $MNDIR && node ffmpeg_server.js &>> ffmpeg_server.log &" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
+cd $MNDIR && node ffmpeg_server.js &>> ffmpeg_server.log & || OwnError "Unable To Start Node Server :("
