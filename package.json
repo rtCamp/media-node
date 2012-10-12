@@ -1,0 +1,20 @@
+{
+  "name" : "Media-Node",
+  "description" : "A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-media",
+  "homepage" : "https://github.com/rtCamp/media-node",
+  "author" : {
+    "name" : "rtCamp",
+	"email" : "contact@rtcamp.com",
+	"url" : "http://rtcamp.com"
+  },
+  "version" : "1.0",
+  "dependencies": {
+    "connect": "2.4.x",
+    "formidable": "1.0.x",
+	"sqlite3" : "2.1.x"
+  },
+  "engines" : {
+    "node" : "0.8.x",
+    "npm" : "1.1.x"
+  }
+}
