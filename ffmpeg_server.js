@@ -48,7 +48,7 @@ for (arg in server_args){
 }
 
 function checkAndCreateDirectory(foldername){
-	fs.existsSync(foldername, function (exists) {
+	fs.exists(foldername, function (exists) {
 		if(!exists){
 			fs.mkdirSync(foldername);
 		}
