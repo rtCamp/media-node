@@ -183,6 +183,8 @@ make
 make install || OwnError "Unable To Install Node"
 
 # Check Node Is Installed
+# Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 echo -e "\033[34m Node Version... \e[0m"
 node --version || OwnError "Node Is Not Properly Installed"
 
@@ -191,7 +193,7 @@ node --version || OwnError "Node Is Not Properly Installed"
 clear
 cd $MNDIR
 echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
-curl https://npmjs.org/install.sh | sudo sh || OwnError "Unable To Fetch & Install NPM"
+curl https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
 
 # Check NPM IS Installed
 echo -e "\033[34m NPM Version... \e[0m"
@@ -217,8 +219,10 @@ cd $MNDIR
 cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files"
 
 # Adding Crontab Entry
-echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs"
-echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs"
+echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
+echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
 
 # Start Node
-cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & || OwnError "Unable To Start Node Server"
+# Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
+PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & #|| OwnError "Unable To Start Node Server"
