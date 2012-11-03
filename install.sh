@@ -13,10 +13,32 @@ fi
 
 
 # Check The Linux Distribution
-uname -a | grep Ubuntu
-if [ $? -eq 0 ]
+#uname -a | grep Ubuntu
+#if [ $? -eq 0 ]
+#then
+#	echo -e "\033[34m Ubuntu Detected... \e[0m"
+#	echo -e "\033[34m Transfer Control To Ubuntu Installer Script... \e[0m"
+#	sudo setup/ubuntu.sh
+#fi
+
+KERNEL=`uname -s`
+
+if [ "$KERNEL" = "Linux" ]
 then
-	echo -e "\033[34m Ubuntu Detected... \e[0m"
-	echo -e "\033[34m Transfer Control To Ubuntu Installer Script... \e[0m"
-	sudo setup/ubuntu.sh
+	if [ -f /etc/redhat-release ] || [ -f cat /etc/centos-release ]
+	then
+		sudo setup/redhat.sh
+
+	elif [ -f /etc/lsb-release ]
+	then
+		sudo setup/ubuntu.sh
+
+	elif [ -f  /etc/debian_version ]
+	then
+		sudo setup/debian.sh
+	fi
+
+else
+	echo "echo -e "\033[31m Currently We Support Only Redhat, CentOS, Debian And Ubuntu Linux Distro...\e[0m""
+	
 fi
