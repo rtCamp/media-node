@@ -40,7 +40,7 @@ yum -y erase ffmpeg x264 x264-devel
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc git make nasm pkgconfig wget
+yum -y install gcc git make nasm pkgconfig wget yasm \
 || OwnError "Installation Failed"
 
 
@@ -58,17 +58,17 @@ fi
 
 # Install Yasm Assembler
 # Yasm Is Recommended For x264 & FFmpeg
-clear
-cd $MNDIR
-echo -e "\033[34m Downloading YASM... \e[0m"
-wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz \
-|| OwnError "Unable To Download YASM"
-tar xzvf yasm-1.2.0.tar.gz
-cd yasm-1.2.0
-./configure || OwnError "Unable To Configure YASM"
-make
-echo -e "\033[34m Installing YASM \e[0m"
-make install || OwnError "Unable To Install YASM"
+#clear
+#cd $MNDIR
+#echo -e "\033[34m Downloading YASM... \e[0m"
+#wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz \
+#|| OwnError "Unable To Download YASM"
+#tar xzvf yasm-1.2.0.tar.gz
+#cd yasm-1.2.0
+#./configure || OwnError "Unable To Configure YASM"
+#make
+#echo -e "\033[34m Installing YASM \e[0m"
+#make install || OwnError "Unable To Install YASM"
 
 
 # Install H.264 (x264) Video Encoder
@@ -191,7 +191,7 @@ node --version || OwnError "Node Is Not Properly Installed"
 # Install NPM (Node Package Manager)
 clear
 cd $MNDIR
-echo -e "\033[34m Installing NPM (Node Package Manager)... \e[0m"
+echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
 curl https://npmjs.org/install.sh | sudo sh || OwnError "Unable To Fetch & Install NPM"
 
 # Check NPM IS Installed
