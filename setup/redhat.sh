@@ -35,7 +35,7 @@ fi
 # Remove Any Existing Packages
 clear
 echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
-yum -y erase ffmpeg x264 x264-devel
+yum -y erase ffmpeg x264 x264-devel gcc-c++
 
 #Install The Packages
 clear
@@ -159,16 +159,15 @@ echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
 git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
 cd ffmpeg
 ./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 \
-|| OwnError "Unable To Configure FFmpeg For Debian"
+|| OwnError "Unable To Configure FFmpeg"
 make
-make install
-|| OwnError "Unable To Install FFmpeg For Debian"
+make install || OwnError "Unable To Install FFmpeg"
 
 
 # Adding Entry In Hash Table
-clear
-echo -e "\033[34m Updating Hash Table... \e[0m"
-hash x264 ffmpeg ffplay ffprobe || OwnError "Unable To Update Hash Table"
+#clear
+#echo -e "\033[34m Updating Hash Table... \e[0m"
+#hash x264 ffmpeg ffplay ffprobe || OwnError "Unable To Update Hash Table"
 
 
 
