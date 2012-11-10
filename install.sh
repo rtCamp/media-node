@@ -25,17 +25,17 @@ KERNEL=`uname -s`
 
 if [ "$KERNEL" = "Linux" ]
 then
-	if [ -f /etc/redhat-release ] || [ -f cat /etc/centos-release ]
+	if [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]
 	then
-		sudo setup/redhat.sh
+		sudo bash setup/redhat.sh
 
 	elif [ -f /etc/lsb-release ]
 	then
-		sudo setup/ubuntu.sh
+		sudo bash setup/ubuntu.sh
 
 	elif [ -f  /etc/debian_version ]
 	then
-		sudo setup/debian.sh
+		sudo bash setup/debian.sh
 	fi
 
 else
