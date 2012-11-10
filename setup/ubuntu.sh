@@ -16,8 +16,8 @@ then
 else
 	BASEDIR=$(pwd)
 fi
-echo $BASEDIR
-exit 0;
+#echo $BASEDIR
+#exit 0;
 #mkdir $MNDIR || OwnError "Unable To Create $MNDIR :("
 #echo -e "\033[34m Directory: $MNDIR Created \e[0m"
 
