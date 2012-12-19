@@ -33,9 +33,12 @@ fi
 
 # Add Repository
 # Git Repositoty
-rpm -i http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.i386.rpm
+wget -c http://packages.sw.be/rpmforge-release/rpmforge-release-0.5.2-2.el5.rf.i386.rpm
+rpm -i rpmforge-release-0.5.2-2.el5.rf.i386.rpm
 # Python2.6 Repository
-rpm -i http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+wget -c http://dl.fedoraproject.org/pub/epel/5/i386/epel-release-5-4.noarch.rpm
+rpm -i epel-release-5-4.noarch.rpm
+
 
 # Remove Any Existing Packages
 clear
