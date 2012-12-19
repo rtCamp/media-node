@@ -48,10 +48,6 @@ echo -e "\033[34m  Installing Packages... \e[0m"
 yum -y install gcc gcc-c++ git make nasm pkgconfig wget yasm python26 \
 || OwnError "Installation Failed"
 
-# Make Python2.6 As Default Python
-mv /usr/bin/python /usr/bin/python.bak 
-ln -s /usr/bin/python2.6 /usr/bin/python \
-|| OwnError "Unable To Make Python2.6 As Default Python Version"
 
 # Making Directory For Cloning Encoders
 clear
@@ -179,6 +175,11 @@ make install || OwnError "Unable To Install FFmpeg"
 #hash x264 ffmpeg ffplay ffprobe || OwnError "Unable To Update Hash Table"
 
 
+
+# Make Python2.6 As Default Python
+mv /usr/bin/python /usr/bin/python.bak 
+ln -s /usr/bin/python2.6 /usr/bin/python \
+|| OwnError "Unable To Make Python2.6 As Default Python Version"
 
 # Install Node
 clear
