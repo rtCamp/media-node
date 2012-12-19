@@ -45,7 +45,7 @@ yum -y erase ffmpeg x264 x264-devel gcc-c++
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc git make nasm pkgconfig wget yasm \
+yum -y install gcc git make nasm pkgconfig wget yasm python26 \
 || OwnError "Installation Failed"
 
 # Make Python2.6 As Default Python
