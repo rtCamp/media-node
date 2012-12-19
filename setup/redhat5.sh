@@ -45,7 +45,7 @@ yum -y erase ffmpeg x264 x264-devel gcc-c++
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc git make nasm pkgconfig wget yasm python26 \
+yum -y install gcc gcc-c++ git make nasm pkgconfig wget yasm python26 \
 || OwnError "Installation Failed"
 
 # Make Python2.6 As Default Python
@@ -235,3 +235,10 @@ echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &
 # Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
 PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
 cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & #|| OwnError "Unable To Start Node Server"
+
+
+# Clean Up
+# Make Python2.4 As Default Python
+rm /usr/bin/python
+mv /usr/bin/python.bak /usr/bin/python \
+|| OwnError "Unable To Make Python2.4 As Default Python Version"
