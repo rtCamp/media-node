@@ -168,7 +168,7 @@ git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg 
 cd ffmpeg
 ./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 \
 || OwnError "Unable To Configure FFmpeg"
-make
+make || OwnError "Unable To Make FFmpeg"
 make install || OwnError "Unable To Install FFmpeg"
 
 
@@ -180,69 +180,69 @@ make install || OwnError "Unable To Install FFmpeg"
 
 
 # Make Python2.6 As Default Python
-mv /usr/bin/python /usr/bin/python.bak 
-ln -s /usr/bin/python2.6 /usr/bin/python \
-|| OwnError "Unable To Make Python2.6 As Default Python Version"
+#mv /usr/bin/python /usr/bin/python.bak 
+#ln -s /usr/bin/python2.6 /usr/bin/python \
+#|| OwnError "Unable To Make Python2.6 As Default Python Version"
 
 # Install Node
-clear
-cd $MNDIR
-echo -e "\033[34m Downloading Node... \e[0m"
-wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz || OwnError "Unable To Fetch Node"
-tar -zxvf node-v0.8.9.tar.gz
-cd node-v0.8.9
-./configure || OwnError "Unable To Configure Node"
-make
-make install || OwnError "Unable To Install Node"
+#clear
+#cd $MNDIR
+#echo -e "\033[34m Downloading Node... \e[0m"
+#wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz || OwnError "Unable To Fetch Node"
+#tar -zxvf node-v0.8.9.tar.gz
+#cd node-v0.8.9
+#./configure || OwnError "Unable To Configure Node"
+#make
+#make install || OwnError "Unable To Install Node"
 
 # Check Node Is Installed
 # Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
-echo -e "\033[34m Node Version... \e[0m"
-node --version || OwnError "Node Is Not Properly Installed"
+#PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+#echo -e "\033[34m Node Version... \e[0m"
+#node --version || OwnError "Node Is Not Properly Installed"
 
 
 # Install NPM (Node Package Manager)
-clear
-cd $MNDIR
-echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
-curl https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
+#clear
+#cd $MNDIR
+#echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
+#curl https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
 
 # Check NPM IS Installed
-echo -e "\033[34m NPM Version... \e[0m"
-npm -v || OwnError "NPM Is Not Properly Installed"
+#echo -e "\033[34m NPM Version... \e[0m"
+#npm -v || OwnError "NPM Is Not Properly Installed"
 
 
 # Clonning The Media-Node Repository
-clear
-cd $MNDIR
+#clear
+#cd $MNDIR
 #echo -e "\033[34m Clonning Media Node Repository... \e[0m"
 #git clone git://github.com/rtCamp/media-node.git
 #cd media-node
-echo -e "\033[34m Installing Formidable Node Module... \e[0m"
-npm install formidable || OwnError "Unable To Install Formidable Node Module"
-echo -e "\033[34m Installing Connect Node Module... \e[0m"
-npm install connect || OwnError "Unable To Install Connect Node Module"
-echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
-npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
+#echo -e "\033[34m Installing Formidable Node Module... \e[0m"
+#npm install formidable || OwnError "Unable To Install Formidable Node Module"
+#echo -e "\033[34m Installing Connect Node Module... \e[0m"
+#npm install connect || OwnError "Unable To Install Connect Node Module"
+#echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
+#npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
 
 # Copy Media Node Files
-clear
-cd $MNDIR
-cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files"
+#clear
+#cd $MNDIR
+#cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files"
 
 # Adding Crontab Entry
-echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
-echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
+#echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
+#echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
 
 # Start Node
 # Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
-PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
-cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & #|| OwnError "Unable To Start Node Server"
+#PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin
+#cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & #|| OwnError "Unable To Start Node Server"
 
 
 # Clean Up
 # Make Python2.4 As Default Python
-rm /usr/bin/python
-mv /usr/bin/python.bak /usr/bin/python \
-|| OwnError "Unable To Make Python2.4 As Default Python Version"
+#rm /usr/bin/python
+#mv /usr/bin/python.bak /usr/bin/python \
+#|| OwnError "Unable To Make Python2.4 As Default Python Version"
