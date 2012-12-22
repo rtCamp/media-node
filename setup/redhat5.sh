@@ -56,6 +56,8 @@ yum -y install gcc gcc-c++ git make nasm pkgconfig wget yasm python26 \
 clear
 if [ -d ~root/media-node ]
 then
+	rm -rf ~root/media-node
+	mkdir ~root/media-node/ || OwnError "Unable To Create /root/media-node"
 	MNDIR=~root/media-node/
 else
 	mkdir ~root/media-node/ || OwnError "Unable To Create ~root/media-node"
