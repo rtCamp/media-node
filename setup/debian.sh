@@ -50,6 +50,9 @@ else
 fi
 
 
+# Install Deb Multimedia Keys
+sudo apt-get install -y deb-multimedia-keyring
+
 # Update The Dependencies
 clear
 echo -e "\033[34m Updating Dependencies... \e[0m"
@@ -59,7 +62,7 @@ sudo apt-get update || OwnError "Dependencies Update Failed"
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages For Debian \e[0m"
-sudo apt-get -y --force-yes install autoconf build-essential checkinstall git libfaac-dev \
+sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev \
 libgpac-dev libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
 libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev texi2html \
