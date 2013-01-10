@@ -37,10 +37,19 @@ clear
 echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
 yum -y erase ffmpeg x264 x264-devel gcc-c++
 
+
+# Create A Repository For Libfaac
+echo "[linuxtech]" >> /etc/yum.repos.d/linuxtech.repo
+echo "name=LinuxTECH" >> /etc/yum.repos.d/linuxtech.repo
+echo "baseurl=http://pkgrepo.linuxtech.net/el6/release/" >> /etc/yum.repos.d/linuxtech.repo
+echo "enabled=1" >> /etc/yum.repos.d/linuxtech.repo
+echo "gpgcheck=1" >> /etc/yum.repos.d/linuxtech.repo
+echo "gpgkey=http://pkgrepo.linuxtech.net/el6/release/RPM-GPG-KEY-LinuxTECH.NET" >> /etc/yum.repos.d/linuxtech.repo
+
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc git make nasm pkgconfig wget yasm \
+yum -y install gcc git make nasm pkgconfig wget yasm libfaac-devel \
 || OwnError "Installation Failed"
 
 
@@ -158,7 +167,7 @@ cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
 git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
 cd ffmpeg
-./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 \
+./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libfaac --enable-nonfree \
 || OwnError "Unable To Configure FFmpeg"
 make
 make install || OwnError "Unable To Install FFmpeg"
