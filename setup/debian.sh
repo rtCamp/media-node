@@ -65,7 +65,7 @@ echo -e "\033[34m  Installing Packages For Debian \e[0m"
 sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev \
 libgpac-dev libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
-libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev texi2html \
+libx11-dev libxfixes-dev pkg-config texi2html zlib1g-dev texi2html \
 || OwnError "Debian Installation Failed"
 
 
@@ -79,6 +79,18 @@ else
 	MNDIR=~root/media-node/
 fi
 
+
+# Install Yasm Assembler
+clear
+cd $MNDIR
+echo -e "\033[34m Downloading/Installing Yasm... \e[0m"
+wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz || OwnError "Unable To Fetch YASM :("
+tar zxvf yasm-1.2.0.tar.gz
+cd yasm-1.2.0
+./configure || OwnError "Unable To Configure YASM :("
+make
+sudo checkinstall --pkgname=yasm --pkgversion="1.2.0" --backup=no --deldoc=yes --default \
+|| OwnError "Unable To Install YASM For $Version :("
 
 
 # Install H.264 (x264) Video Encoder
