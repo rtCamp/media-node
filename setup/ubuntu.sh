@@ -80,6 +80,8 @@ then
 elif [ $Ubuntu1204 -eq 0 ]
 then
 	Version=Ubuntu1204
+else
+	Version=Ubuntu1204
 fi
 
 # Tell Users About Detetcted Desktop & Version
@@ -175,7 +177,7 @@ then
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
 		librtmp-dev libsdl1.2-dev libtheora-dev libtool libva-dev libvdpau-dev libvorbis-dev \
-		libx11-dev libxfixes-dev pkg-config texi2html yasm zlib1g-dev \
+		libx11-dev libxfixes-dev pkg-config texi2html zlib1g-dev \
 		|| OwnError "$Version Desktop Installation Failed :("
 	else
 
@@ -203,7 +205,7 @@ fi
 
 # Install Yasm Assembler
 # Yasm Is Recommended For x264 & FFmpeg In Ubuntu8.04/ 10.04
-if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ]
+if [ $Version = Ubuntu804 ] || [ $Version = Ubuntu1004 ] || [ $Version = Ubuntu1204 ]
 then
 	clear
 	cd $MNDIR
