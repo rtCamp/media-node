@@ -142,7 +142,7 @@ function queueHandler() {
             } else {
                 interval = current_file.duration/2;
                 thumbs[0] = basename + '0.jpg';
-                commands[0] = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet -filter:v yadif -an -ss 1 -t 00:00:01 -r ' + interval + ' -y -vcodec mjpeg -f mjpeg "' + temp_folder + thumbs[1] + '" 2>&1';
+                commands[0] = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet -filter:v yadif -an -ss 1 -t 00:00:01 -r ' + interval + ' -y -vcodec mjpeg -f mjpeg "' + temp_folder + thumbs[0] + '" 2>&1';
             }
         //var thumb = 'ffmpeg  -itsoffset -4  -i ' + queued_folder + current_file.filename + ' -vcodec mjpeg -vframes 1 -an -f rawvideo -s 320x240 ' + temp_folder + thumbname;
         }
@@ -226,12 +226,48 @@ function queueHandler() {
  * 2:	Audio(MP3)
  **/
 db.serialize(function() {
-    db.run("CREATE TABLE IF NOT EXISTS ffmpeg_transactions (transaction_id INTEGER PRIMARY KEY, creation_date INTEGER, original_file TEXT, status INT, output_type INT, transcoded_file TEXT, callback_url TEXT, duration INT, thumbs INT )");
+    db.run("CREATE TABLE IF NOT EXISTS transactions (transaction_id INTEGER PRIMARY KEY AUTOINCREMENT, creation_date INTEGER, original_file TEXT, status INT, output_type INT, transcoded_file TEXT, callback_url TEXT, duration INT NULL DEFAULT NULL, thumbs INT NULL DEFAULT NULL)");
+    db_run_error_handler('ALTER TABLE transactions ADD COLUMN duration INT NULL;');
+    db_run_error_handler('ALTER TABLE transactions ADD COLUMN thumbs INT NULL;');
 });
+
+//Prevent server from crashing due to errors
+process.on('uncaughtException', function(err) {
+    console.error(err.stack);
+});
+
+
+function db_run_error_handler(command){
+    try {
+        db.run(command,function(error) {
+            if(error) {
+                throw error;
+            }
+        }
+        );
+    } catch(err) {
+        dumpError(err);
+    }
+}
+
+function dumpError(err) {
+    if (typeof err === 'object') {
+        if (err.message) {
+            console.log('\nMessage: ' + err.message)
+        }
+        if (err.stack) {
+            console.log('\nStacktrace:')
+            console.log('====================')
+            console.log(err.stack);
+        }
+    } else {
+        console.log('dumpError :: argument is not an object');
+    }
+}
 
 function update_transaction_status(vid,status){
     vid.status = status;
-    var stmt = db.prepare("UPDATE ffmpeg_transactions SET status = ? WHERE transaction_id = ?");
+    var stmt = db.prepare("UPDATE transactions SET status = ? WHERE transaction_id = ?");
     stmt.run(status,vid.id);
     return vid;
 }
@@ -287,21 +323,21 @@ function insert_transaction(filename,status,output_type,callback_url,res,duratio
     db.serialize(function() {
         if(typeof callback_url !== undefined){
             if(output_type == 1) {
-                var stmt = db.prepare("INSERT INTO ffmpeg_transactions (creation_date,output_type,original_file,status,callback_url,duration,thumbs) VALUES (strftime('%s','now'),?,?,?,?,?,?)");
+                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url,duration,thumbs) VALUES (strftime('%s','now'),?,?,?,?,?,?)");
             } else {
-                var stmt = db.prepare("INSERT INTO ffmpeg_transactions (creation_date,output_type,original_file,status,callback_url) VALUES (strftime('%s','now'),?,?,?,?)");
+                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url) VALUES (strftime('%s','now'),?,?,?,?)");
             }
             stmt.run(output_type,filename,status,callback_url);
             vid.callback_url = callback_url;
         }
         else{
-            var stmt = db.prepare("INSERT INTO ffmpeg_transactions (creation_date,output_type,original_file,status) VALUES (strftime('%s','now'),?,?,?)");
+            var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status) VALUES (strftime('%s','now'),?,?,?)");
             stmt.run(output_type,filename,status);
         }
         stmt.finalize();
         db.each('SELECT last_insert_rowid() as last_id',function(err,row){
             //console.log(row.last_id);
-            if(typeof row.last_id !== 'undefined'){
+            if(typeof row.last_id !== undefined){
                 if(status == 0){
 					
                     vid.id = row.last_id;
@@ -335,7 +371,7 @@ connect()
                 res.writeHead(200, {
                     'content-type': 'text/plain'
                 });
-                if(typeof(files.upload)=='undefined'){
+                if(typeof(files.upload)==undefined){
                     console.log('Upload file not found in the request');
                     output['error'] = 'Upload file not found';
                     res.end(JSON.stringify(output));
@@ -379,13 +415,13 @@ connect()
                         }
                         if (error !== null) {
                             console.log('Execution error: ' + error);
-                            insert_transaction(newname+'.'+ext,6,output_type,res,fields.duration,fields.thumbs);
+                            insert_transaction(newname+'.'+ext,6,output_type,res,parseInt(fields.duration),parseInt(fields.thumbs));
                         }
                         else{
                             console.log(queued_folder + newname + '.' + ext + ' added to the queue');
                             console.log(queue);
-                            if(typeof(fields.callback_url)!=='undefined'){
-                                insert_transaction(newname+'.'+ext,0,output_type,fields.callback_url,res, fields.duration,fields.thumbs);
+                            if(typeof(fields.callback_url)!==undefined){
+                                insert_transaction(newname+'.'+ext,0,output_type,fields.callback_url,res, parseInt(fields.duration),parseInt(fields.thumbs));
                             }
                             else{
                                 insert_transaction(newname+'.'+ext,0,output_type,res, fields.duration,fields.thumbs);
