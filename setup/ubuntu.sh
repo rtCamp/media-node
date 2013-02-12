@@ -458,10 +458,11 @@ npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
 clear
 cd $MNDIR
 cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files :("
+cp -rv $BASEDIR/.* . || OwnError "Unable To Copy Media Node Files :("
 
 # Adding Crontab Entry
 echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
 echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs :("
 
 # Start Node
-cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & || OwnError "Unable To Start Node Server :("
+cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log & #|| OwnError "Unable To Start Node Server :("
