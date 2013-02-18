@@ -17,6 +17,7 @@ var temp_folder = './temp/';
 var completed_folder = './completed/';
 var transcoder_port = 1203;
 var transcoder_ip = '127.0.0.1'; //This will allow the transcoding server to run locally only
+var version = '2.0'; //version
 var server_args = process.argv.slice(2);
 for (arg in server_args){
     switch(server_args[arg]){
@@ -434,8 +435,8 @@ connect()
         }
 		
         /**
-		 * This block is to show the status of the queue on the frontend
-		 **/
+         * This block is to show the status of the queue on the frontend
+         **/
         if (req.url == '/status'||req.url == '/status/'){
             res.writeHead(200, {
                 'content-type': 'text/plain'
@@ -448,10 +449,22 @@ connect()
             res.end();
             return;
         }
+        
+        /**
+         * This block is to show the version of media node installed
+         **/
+        if (req.url == '/version'||req.url == '/version/'){
+            res.writeHead(200, {
+                'content-type': 'text/plain'
+            });
+            res.write(version);
+            res.end();
+            return;
+        }
 		
         /**
-		 * This block will show the upload form with callback url to be opened when the transcoding is complete
-		 **/
+         * This block will show the upload form with callback url to be opened when the transcoding is complete
+         **/
         if(req.url == '/' ){
             res.writeHead(200, {
                 'content-type': 'text/html'
