@@ -23,13 +23,13 @@ OwnError()
 
 
 # Save The Base Directory Path
-pwd | grep setup &> /dev/null
-if [ $? -eq 0 ]
-then
-	BASEDIR=$(cd ..; pwd)
-else
-	BASEDIR=$(pwd)
-fi
+#pwd | grep setup &> /dev/null
+#if [ $? -eq 0 ]
+#then
+#	BASEDIR=$(cd ..; pwd)
+#else
+#	BASEDIR=$(pwd)
+#fi
 
 
 # Remove Any Existing Packages
@@ -208,10 +208,16 @@ echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
 npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
 
 # Copy Media Node Files
+#clear
+#cd $MNDIR
+#cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files"
+#cp -rv $BASEDIR/.* . || OwnError "Unable To Copy Media Node Files"
 clear
-cd $MNDIR
-cp -rv $BASEDIR/* . || OwnError "Unable To Copy Media Node Files"
-cp -rv $BASEDIR/.* . || OwnError "Unable To Copy Media Node Files"
+cd /tmp
+git clone git://github.com/rtCamp/media-node.git
+cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
+cp -rv  media-node/.* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
+
 
 # Adding Crontab Entry
 echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs"

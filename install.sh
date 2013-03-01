@@ -27,15 +27,18 @@ if [ "$KERNEL" = "Linux" ]
 then
 	if [ -f /etc/redhat-release ] || [ -f /etc/centos-release ]
 	then
-		sudo bash setup/redhat.sh
+		wget -c https://raw.github.com/rtCamp/media-node/master/setup/redhat.sh
+		sudo bash redhat.sh
 
 	elif [ -f /etc/lsb-release ]
 	then
-		sudo bash setup/ubuntu.sh
+		wget -c https://raw.github.com/rtCamp/media-node/master/setup/ubuntu.sh
+		sudo bash ubuntu.sh
 
 	elif [ -f  /etc/debian_version ]
 	then
-		sudo bash setup/debian.sh
+		wget -c https://raw.github.com/rtCamp/media-node/master/setup/debian.sh
+		sudo bash debian.sh
 	fi
 
 else
