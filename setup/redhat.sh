@@ -35,7 +35,7 @@ OwnError()
 # Remove Any Existing Packages
 clear
 echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
-yum -y erase ffmpeg x264 x264-devel
+yum -y erase ffmpeg x264 x264-devel yasm
 
 
 # Create A Repository For Libfaac
@@ -49,7 +49,8 @@ echo "gpgkey=http://pkgrepo.linuxtech.net/el6/release/RPM-GPG-KEY-LinuxTECH.NET"
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc gcc-c++ git make nasm pkgconfig wget yasm libfaac-devel \
+yum -y install git --disablerepo=updates
+yum -y install gcc gcc-c++ git make nasm pkgconfig wget libfaac-devel \
 || OwnError "Installation Failed"
 
 
@@ -67,17 +68,17 @@ fi
 
 # Install Yasm Assembler
 # Yasm Is Recommended For x264 & FFmpeg
-#clear
-#cd $MNDIR
-#echo -e "\033[34m Downloading YASM... \e[0m"
-#wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz \
-#|| OwnError "Unable To Download YASM"
-#tar xzvf yasm-1.2.0.tar.gz
-#cd yasm-1.2.0
-#./configure || OwnError "Unable To Configure YASM"
-#make
-#echo -e "\033[34m Installing YASM \e[0m"
-#make install || OwnError "Unable To Install YASM"
+clear
+cd $MNDIR
+echo -e "\033[34m Downloading YASM... \e[0m"
+wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz \
+|| OwnError "Unable To Download YASM"
+tar xzvf yasm-1.2.0.tar.gz
+cd yasm-1.2.0
+./configure || OwnError "Unable To Configure YASM"
+make
+echo -e "\033[34m Installing YASM \e[0m"
+make install || OwnError "Unable To Install YASM"
 
 
 # Install H.264 (x264) Video Encoder
@@ -231,7 +232,7 @@ clear
 cd /tmp
 git clone git://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
-cp -rv  media-node/.* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
+cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 
 
 # Adding Crontab Entry
