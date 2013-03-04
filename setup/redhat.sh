@@ -35,7 +35,7 @@ OwnError()
 # Remove Any Existing Packages
 clear
 echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
-yum -y erase ffmpeg x264 x264-devel gcc-c++
+yum -y erase ffmpeg x264 x264-devel
 
 
 # Create A Repository For Libfaac
@@ -49,7 +49,7 @@ echo "gpgkey=http://pkgrepo.linuxtech.net/el6/release/RPM-GPG-KEY-LinuxTECH.NET"
 #Install The Packages
 clear
 echo -e "\033[34m  Installing Packages... \e[0m"
-yum -y install gcc git make nasm pkgconfig wget yasm libfaac-devel \
+yum -y install gcc gcc-c++ git make nasm pkgconfig wget yasm libfaac-devel \
 || OwnError "Installation Failed"
 
 
