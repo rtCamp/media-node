@@ -75,7 +75,7 @@ wget -c http://www.tortall.net/projects/yasm/releases/yasm-1.2.0.tar.gz \
 || OwnError "Unable To Download YASM"
 tar xzvf yasm-1.2.0.tar.gz
 cd yasm-1.2.0
-./configure || OwnError "Unable To Configure YASM"
+./configure --prefix=/usr || OwnError "Unable To Configure YASM"
 make
 echo -e "\033[34m Installing YASM \e[0m"
 make install || OwnError "Unable To Install YASM"
