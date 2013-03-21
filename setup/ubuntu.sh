@@ -463,7 +463,7 @@ clear
 cd /tmp
 git clone git://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
-cp -rv  media-node/.* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
+cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 
 
 
