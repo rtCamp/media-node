@@ -226,7 +226,7 @@ cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
 git clone --depth 1 git://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository:("
 cd x264
-./configure --enable-static || OwnError "Unable To Configure x264 :("
+./configure --enable-shared --enable-static || OwnError "Unable To Configure x264 :("
 make
 if [ $Version = Ubuntu804 ]
 then
