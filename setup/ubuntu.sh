@@ -418,12 +418,12 @@ hash x264 ffmpeg ffplay ffprobe || OwnError "Unable To Update Hash Table :("
 clear
 cd $MNDIR
 echo -e "\033[34m Downloading Node... \e[0m"
-wget -c http://nodejs.org/dist/v0.8.9/node-v0.8.9.tar.gz || OwnError "Unable To Fetch Node :("
-tar -zxvf node-v0.8.9.tar.gz
-cd node-v0.8.9
-./configure || OwnError "Unable To Configure Node :("
+wget -c http://nodejs.org/dist/v0.10.13/node-v0.10.13.tar.gz || OwnError "Unable To Fetch Node"
+tar -zxvf node-v0.10.13.tar.gz
+cd node-v0.10.13
+./configure || OwnError "Unable To Configure Node"
 make
-make install || OwnError "Unable To Install Node:("
+make install || OwnError "Unable To Install Node"
 
 # Check Node Is Installed
 echo -e "\033[34m Node Version... \e[0m"
