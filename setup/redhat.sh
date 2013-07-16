@@ -152,10 +152,10 @@ make install || OwnError "Unable To Install VP8"
 clear
 cd $MNDIR
 echo -e "\033[34m Downloading Zlib... \e[0m"
-wget -c http://zlib.net/zlib-1.2.7.tar.gz \
+wget -c http://zlib.net/zlib-1.2.8.tar.gz \
 || OwnError "Unable To Downlaod Zlib"
-tar xzvf zlib-1.2.7.tar.gz
-cd zlib-1.2.7
+tar xzvf zlib-1.2.8.tar.gz
+cd zlib-1.2.8
 ./configure || OwnError "Unable To Configure Zlib"
 make
 echo -e "\033[34m Installing Zlib \e[0m"
