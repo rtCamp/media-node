@@ -219,6 +219,9 @@ git clone git://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 
+# Fix libx264.so.x
+echo "/usr/local/lib" >> /etc/ld.so.conf.d/media-node.conf || OwnError "Unable To Set Library For Media-Node"
+ldconfig || OwnError "Unable To Execute ldconfig"
 
 # Adding Crontab Entry
 echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/crontabs/root || OwnError "Unable To Install Crontabs"
