@@ -60,6 +60,22 @@ checkAndCreateDirectory(queued_folder);
 checkAndCreateDirectory(temp_folder);
 checkAndCreateDirectory(completed_folder);
 
+/**
+ * If the server is terminated when the files are still in queue or being converted, 
+ * this function re-queues those files at the startup.
+ * */
+function reQueueFiles(){
+	db.each('SELECT * FROM transactions WHERE status = 1 OR status = 2',function(err,row){
+		var vid={};
+		vid.id = row.transaction_id;
+		vid.filename = row.original_file;
+		vid.status = 1;
+		vid.output_type = row.output_type;
+		queue.push(vid);
+	});
+}
+reQueueFiles();
+
 console.log('Starting FFMPEG Server on '+transcoder_ip+':'+transcoder_port);
 function queueHandler() {
     if(processing >= max_processing ){
