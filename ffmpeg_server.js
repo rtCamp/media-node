@@ -495,7 +495,7 @@ connect()
                 );
             return;
         }
-		
+
         /**
 		 * Case when nothing matches gives 404 error message
 		 **/
@@ -539,4 +539,4 @@ function send_callback(callback_url,output){
 }
 
 //To start the queue handler after the server is started(just in case there are some earlier queued files)
-queueHandler();
+setTimeout(function(){queueHandler();},5000);
