@@ -537,3 +537,6 @@ function send_callback(callback_url,output){
     req.write(data);
     req.end();
 }
+
+//To start the queue handler after the server is started(just in case there are some earlier queued files)
+queueHandler();
