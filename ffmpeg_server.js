@@ -66,6 +66,7 @@ checkAndCreateDirectory(completed_folder);
  * */
 function reQueueFiles(){
 	db.each('SELECT * FROM transactions WHERE status = 1 OR status = 2',function(err,row){
+        if(typeof row === 'undefined'){ return false;}
 		var vid={};
 		vid.id = row.transaction_id;
 		vid.filename = row.original_file;
