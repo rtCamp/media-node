@@ -143,6 +143,7 @@ echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
 git clone http://git.chromium.org/webm/libvpx.git \
 || OwnError "Unable To Clonning VP8 Repository"
 cd libvpx
+git checkout v1.3.0 || OwnError "Unable To checkout VP8 v1.3.0"
 ./configure || OwnError "Unable To Configure VP8"
 make
 make install || OwnError "Unable To Install VP8"
