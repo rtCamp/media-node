@@ -81,6 +81,16 @@ echo -e "\033[34m Installing YASM \e[0m"
 make install || OwnError "Unable To Install YASM"
 
 
+# Install H.264 (x264) Video Encoder
+clear
+cd $MNDIR
+echo -e "\033[34m Cloning x264 Repo... \e[0m"
+git clone https://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository"
+cd x264
+./configure --enable-shared --enable-static || OwnError "Unable To Configure x264"
+make
+echo -e "\033[34m Installing x264 \e[0m"
+make install || OwnError "Unable To Install x264"
 
 
 
@@ -157,7 +167,7 @@ make install || OwnError "Unable To Install Zlib"
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
-git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
+git clone https://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
 cd ffmpeg
 ./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libfaac --enable-nonfree \
 || OwnError "Unable To Configure FFmpeg"
@@ -221,7 +231,7 @@ npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
 #cp -rv $BASEDIR/.* . || OwnError "Unable To Copy Media Node Files"
 clear
 cd /tmp
-git clone git://github.com/rtCamp/media-node.git
+git clone https://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 
