@@ -85,7 +85,7 @@ make install || OwnError "Unable To Install YASM"
 clear
 cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
-git clone git://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository"
+git clone git://repo.or.cz/x264.git || OwnError "Unable To Clonning x264 Repository"
 cd x264
 ./configure --enable-shared --enable-static || OwnError "Unable To Configure x264"
 make
