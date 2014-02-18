@@ -85,8 +85,8 @@ make install || OwnError "Unable To Install YASM"
 clear
 cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
-git clone https://github.com/vapvarun/vlcx264 || OwnError "Unable To Clonning x264 Repository"
-cd vlcx264
+git clone https://github.com/vapvarun/x264 || OwnError "Unable To Clonning x264 Repository"
+cd x264
 ./configure --enable-shared --enable-static || OwnError "Unable To Configure x264"
 make
 echo -e "\033[34m Installing x264 \e[0m"
