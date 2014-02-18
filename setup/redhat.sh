@@ -35,7 +35,6 @@ OwnError()
 # Remove Any Existing Packages
 clear
 echo -e "\033[34m Removing Unwanted Softwares... \e[0m"
-yum -y erase ffmpeg x264 x264-devel yasm
 
 
 # Create A Repository For Libfaac
@@ -85,8 +84,9 @@ make install || OwnError "Unable To Install YASM"
 clear
 cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
-git clone git://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository"
-cd x264
+wget -c ftp://ftp.videolan.org/pub/x264/snapshots/last_x264.tar.bz2 || OwnError "Unable To Clonning x264 Repository"
+tar jxf last_x264.tar.bz2
+cd x264-snapshot-20140217-2245
 ./configure --enable-shared --enable-static || OwnError "Unable To Configure x264"
 make
 echo -e "\033[34m Installing x264 \e[0m"
@@ -106,7 +106,6 @@ cd lame-3.99.5
 make
 echo -e "\033[34m Installing LAME \e[0m"
 make install || OwnError "Unable To Install LAME"
-
 
 # Install Libogg 
 clear
@@ -140,10 +139,8 @@ make install || OwnError "Unable To Install Libvorbis"
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
-git clone http://git.chromium.org/webm/libvpx.git \
-|| OwnError "Unable To Clonning VP8 Repository"
+git clone https://github.com/vapvarun/libvpx
 cd libvpx
-git checkout v1.3.0 || OwnError "Unable To checkout VP8 v1.3.0"
 ./configure || OwnError "Unable To Configure VP8"
 make
 make install || OwnError "Unable To Install VP8"
@@ -167,8 +164,8 @@ make install || OwnError "Unable To Install Zlib"
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
-git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
-cd ffmpeg
+git clone https://github.com/takis/FFmpeg || OwnError "Unable To Clonning FFmpeg Repository"
+cd FFmpeg
 ./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libfaac --enable-nonfree \
 || OwnError "Unable To Configure FFmpeg"
 make
@@ -203,9 +200,11 @@ node --version || OwnError "Node Is Not Properly Installed"
 # Install NPM (Node Package Manager)
 clear
 cd $MNDIR
+mkdir extra
+cd extra
 echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
-curl https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
-
+wget -c https://npmjs.org/install.sh || OwnError "Unable To Fetch & Install NPM"
+bash install.sh
 # Check NPM IS Installed
 echo -e "\033[34m NPM Version... \e[0m"
 npm -v || OwnError "NPM Is Not Properly Installed"
@@ -231,7 +230,7 @@ npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
 #cp -rv $BASEDIR/.* . || OwnError "Unable To Copy Media Node Files"
 clear
 cd /tmp
-git clone git://github.com/rtCamp/media-node.git
+git clone https://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 
@@ -241,7 +240,7 @@ ldconfig || OwnError "Unable To Execute ldconfig"
 
 # Adding Crontab Entry
 echo "PATH=/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
-echo "@reboot cd $MNDIR && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
+echo "@reboot cd /media-node && node ffmpeg_server.js >> /var/log/ffmpeg_server.log &" >> /var/spool/cron/root || OwnError "Unable To Install Crontabs"
 
 # Start Node
 # Sudo Don't Insclude /usr/local/bin and /usr/local/sbin Path in $PATH Variable
