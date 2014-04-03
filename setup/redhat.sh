@@ -204,7 +204,7 @@ node --version || OwnError "Node Is Not Properly Installed"
 clear
 cd $MNDIR
 echo -e "\033[34m Installing NPM Node Package Manager... \e[0m"
-curl https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
+curl -sL https://npmjs.org/install.sh | bash || OwnError "Unable To Fetch & Install NPM"
 
 # Check NPM IS Installed
 echo -e "\033[34m NPM Version... \e[0m"
