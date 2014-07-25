@@ -146,7 +146,7 @@ function queueHandler() {
         
         if(current_file.output_type == 1){
             filename = basename + '.mp4';
-            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet -r 24 -vcodec libx264 -vprofile high -preset slow -vf scale=640:480 -b:v 1500k -maxrate 100k -bufsize 200k -threads 1 -acodec libfaac -b:a 128k "' + temp_folder + filename + '"';
+            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet -r 24 -vcodec libx264 -vprofile high -preset slow -vf scale=640:480 -b:v 1500k -maxrate 100k -bufsize 200k -pix_fmt yuv420p -threads 1 -acodec libfaac -b:a 128k "' + temp_folder + filename + '"';
             var commands = new Array();
             var thumbs = new Array();
             var interval;
