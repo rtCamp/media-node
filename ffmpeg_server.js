@@ -17,6 +17,7 @@ var temp_folder = './temp/';
 var completed_folder = './completed/';
 var transcoder_port = 1203;
 var transcoder_ip = '127.0.0.1'; //This will allow the transcoding server to run locally only
+var transcoder_public_ip = '127.0.0.1'; // This is your public ip address
 var version = '2.0'; //version
 var server_args = process.argv.slice(2);
 for (arg in server_args){
@@ -202,7 +203,7 @@ function queueHandler() {
                         current_file = update_transaction_status(current_file,3);
                         var output = {};
                         output['file_id'] = current_file.id;
-                        output['file_url'] = 'http://' + transcoder_ip + ':' + transcoder_port + '/' + filename;
+                        output['file_url'] = 'http://' + transcoder_public_ip + ':' + transcoder_port + '/' + filename;
                         output['status'] = 3;
                         output['file_name'] = filename;
                         console.log(output);
@@ -318,7 +319,7 @@ function generate_thumbs(commands, thumbs, start, end, callback_url, output){
                         }
                     });
                     next = start+1;
-                    output['thumb_'+next] = 'http://' + transcoder_ip + ':' + transcoder_port + '/' + thumbs[start];
+                    output['thumb_'+next] = 'http://' + transcoder_public_ip + ':' + transcoder_port + '/' + thumbs[start];
                     console.log(output);
                     if ( (next < end) && (next in commands) ) {
                         generate_thumbs(commands, thumbs, next, end, callback_url, output);
