@@ -126,10 +126,8 @@ function queueHandler() {
         }
         
         console.log('Filename : ' + current_file.filename );
-
-        var file_name_without_ext = current_file.filename.lastIndexOf(".");        
-
-        var filename = current_file.filename.substring( 0, file_name_without_ext );
+        
+        var filename = current_file.filename.split(".");
         console.log('File info : ' + filename);
 
         var basename = filename[0];
