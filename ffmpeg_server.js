@@ -130,7 +130,8 @@ function queueHandler() {
         var filename = current_file.filename.split(".");
         console.log('File info : ' + filename);
 
-        var basename = filename[0];
+        var filename_ext_index = current_file.filename.lastIndexOf(".");
+        var basename = current_file.filename.substring( 0, filename_ext_index );
         console.log('Filename without extension : '+basename);
         
         if (filename.length>1) {
