@@ -9,19 +9,19 @@ A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-medi
 
 ### Using CURL
 
-* Status *
+*Status*
 
 ```
 curl 127.0.0.1:1023/status
 ```
 
-* Version *
+*Version*
 
 ```
 curl 127.0.0.1:1023/version
 ```
 
-* Upload End point *
+*Upload End point*
 
 ```
 curl 127.0.0.1:1023/upload -F "upload=@/path/to/video/file.ext" -F "callback_url=http://something/callback.php"
@@ -29,6 +29,12 @@ curl 127.0.0.1:1023/upload -F "upload=@/path/to/video/file.ext" -F "callback_url
 
 ### Test using browser
 
+*URLs*
+
 * Upload Form - 127.0.0.1:1023
 * Status - 127.0.0.1:1023/status
 * Version - 127.0.0.1:1023/version
+
+*Nginx Proxy*
+
+If you are running media-node on 127.0.0.1 on remote server, then you should create a proxy site redirect traffic from local server to media-node during testing.
