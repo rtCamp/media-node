@@ -31,7 +31,7 @@ curl 127.0.0.1:1023/upload -F "upload=@/path/to/video/file.ext" -F "callback_url
 
 *URLs*
 
-* Upload Form - 127.0.0.1:1023
+* Upload Form - 127.0.0.1:1023/
 * Status - 127.0.0.1:1023/status
 * Version - 127.0.0.1:1023/version
 
