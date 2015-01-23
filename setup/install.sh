@@ -1,14 +1,13 @@
 #!/bin/bash
 
-
 # Checking Permissions
 Permission=$(id -u)
 #echo $Permission
-if [ $Permission -ne 0 ] 
+if [ $Permission -ne 0 ]
 then
         echo -e "\033[31m Super User Privilege Required... \e[0m"
         echo -e "\033[31m Uses:  sudo $0 \e[0m"
-        exit 100 
+        exit 100
 fi
 
 
@@ -43,5 +42,5 @@ then
 
 else
 	echo "echo -e "\033[31m Currently We Support Only Redhat, CentOS, Debian And Ubuntu Linux Distro...\e[0m""
-	
+
 fi

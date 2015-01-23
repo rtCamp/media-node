@@ -1,0 +1,9 @@
+{
+    "database" : {
+        "dialect" : "sqlite",
+        "db" : "jobs",
+        "user": "",
+        "pass": "",
+        "port": "3306"
+    }
+}

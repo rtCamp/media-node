@@ -1,0 +1,6 @@
+{
+  "development": {
+    "database": "jobs_production",
+    "dialect": "sqlite"
+  }
+}
