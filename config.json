@@ -1,9 +1,11 @@
 {
-    "database" : {
-        "dialect" : "sqlite",
-        "db" : "jobs",
-        "user": "",
-        "pass": "",
-        "port": "3306"
+    "development": {
+        "database": "jobs_production",
+        "dialect": "sqlite",
+        "storage": "data.db",
+
+        "host":"127.0.0.1",
+        "port":"4444",
+        "folder":"./media"
     }
 }

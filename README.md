@@ -1,7 +1,14 @@
 media-node
 ===========
 
-A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-media 
+## Notes
+
+Incoming file: sample.mov
+create videos: sample.mp4, sample.webm, sample.ogv
+and thumbnail: sample-1.jpg, sample-2.jpg, etc
+
+
+A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-media
 
 ## API
 

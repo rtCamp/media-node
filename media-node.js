@@ -1,19 +1,59 @@
-/*
- * Entry Point
- */
+/*********************************************************
+  Main Entry Point
 
+  1. Define all API endpoints as express routes
+  2. Seprate out ffmpeg related code. Move them to fluent-ffmpeg
+  3. Make use of database (not queue - becasue data will keep on adding)
+
+*********************************************************/
+
+
+/*********************************************************
+    require
+*********************************************************/
+
+var express = require('express'),
+    fs = require('fs'),
+    formidable = require('formidable'),
+    mv = require('mv'),
+    models = require("./models"),
+    app = express();
+
+// config
+var env = process.env.NODE_ENV || "development",
+    config = require('./config.json')[env];
+
+/*********************************************************
+    Encoder
+*********************************************************/
 /*
-    TODO:
-    1. Define all API endpoints with dummy responses
-    2. Seprate out config from code
-    3. Seprate out ffmpeg related code. Move them to fluent-ffmpeg
-    4. Make use of database (not queue - becasue data will keep on adding)
+    1. Find all videos which are not encoded yet
+    2. For each one - run encoding
 */
 
-var express = require('express')
-var formidable = require('formidable')
-var app = express()
-var models = require("./models")
+function processQueue() {
+        //Find all jobs with status 'queued'
+        models.Job.findAll({
+                where: {
+                    status: "queued"
+                }
+            })
+            .success(function(err, job) {
+                console.log(job.id);
+                console.log(job.original_file);
+                if (err) {
+                    console.log("oh error! :(")
+                } else {
+                    console.log(job);
+                }
+            })
+    } //end of processQueue
+
+
+
+/**********************************************************
+    express.js routes
+**********************************************************/
 
 // Homepage should show video-upload form
 app.get('/', function(req, res) {
@@ -39,29 +79,61 @@ app.get('/version', function(req, res) {
 
 // Upload video directly here
 app.post('/upload', function(req, res) {
-    var form = new formidable.IncomingForm();
-    form.parse(req, function(err, fields, files) {
-        console.log(err)
-        console.log(fields)
-        console.log(files)
-    })
-    res.send('Upload sucees')
+    rtHandleUpload(req, res)
 })
 
-app.set('port', process.env.PORT || 3000);
+/*********************************************************
+    Make sure media folders are present before api takes over
+*********************************************************/
 
-//database
-models.sequelize.sync().then(function () {
-    var server = app.listen(app.get('port'), function() {
-            var host = server.address().address
-            var port = server.address().port
-            console.log('Example app listening at http://%s:%s', host, port)
+function rtHandleUpload(req, res){
+    var form = new formidable.IncomingForm();
+    form.parse(req, function(err, fields, files) {
+        console.log(files.upload.path);
+        console.log(files.upload.name);
+        mv(files.upload.path, config.folder + files.upload.name, {
+            mkdirp: true
+        }, function(err) {
+            console.log(err);
+            if (err) {
+                res.status(500);
+                res.json({
+                    'success': false
+                });
+            } else {
+                //save to database
+                models.Job.create({
+                    original_file: './media/' + files.upload.name
+                }).then(function(job) {
+                    console.log("Saved new job with #ID = " + job.id);
+                })
+                res.status(200);
+                res.json({
+                    'success': true
+                });
+            }
+
+        });
+    });
+
+}
+function rtDirCheck() {
+    //top-level media folder
+    if (!fs.existsSync(config.folder)) {
+        fs.mkdirSync(config.folder);
+    }
+}
+
+/*********************************************************
+    START Execution
+*********************************************************/
+
+models.sequelize.sync().then(function() {
+    var server = app.listen(config.port, config.host, function() {
+        var host = server.address().address
+        var port = server.address().port
+        console.log('Example app listening at http://%s:%s', host, port);
+        rtDirCheck();
+        processQueue();
     });
 });
-
-// // start media-node server
-// var server = app.listen(3000, function() {
-//     var host = server.address().address
-//     var port = server.address().port
-//     console.log('Example app listening at http://%s:%s', host, port)
-// })

@@ -1,65 +1,3 @@
-var formidable = require('formidable'), //For form handling
-    http = require('http'), //For creating http server required by connect framework
-    connect = require('connect'), //For creating the server for serving static files as well as status of the server
-    util = require('util'), //Inspecting elements for debugging and showing server status
-    fs = require('fs'), //For moving files around and handling uploads
-    sqlite3 = require('sqlite3').verbose(), //For storing the current state of the server(files in queue and currently processing and the files encoded)
-    db = new sqlite3.Database('./db.sqlite'), //Open a database named db.sqlite or create it if not exist
-    url = require('url'), //For parsing the request url
-    exec = require('child_process').exec; //For calling the ffmpeg command and tracking its execution
-var queue = new Array(),
-    completed = new Array(),
-    current = new Array();
-var processing = 0;
-var max_processing = 1;
-var queued_folder = './queued/';
-var temp_folder = './temp/';
-var completed_folder = './completed/';
-var transcoder_port = 1203;
-var transcoder_ip = '127.0.0.1'; //This will allow the transcoding server to run locally only
-var version = '2.0'; //version
-var server_args = process.argv.slice(2);
-for (arg in server_args) {
-    switch (server_args[arg]) {
-        case 'port':
-            if (server_args[parseInt(arg) + 1] !== undefined) {
-                var port_temp = parseInt(server_args[parseInt(arg) + 1]);
-                if (!isNaN(port_temp)) {
-                    transcoder_port = port_temp;
-                }
-            }
-            break;
-        case 'ip':
-            if (server_args[parseInt(arg) + 1] !== undefined) {
-                var ip_temp = server_args[parseInt(arg) + 1];
-                if (ip_temp.match('^(?:[0-9]{1,3}\.){3}[0-9]{1,3}$')) {
-                    transcoder_ip = ip_temp;
-                }
-            }
-            break;
-        case 'parallel':
-            if (server_args[parseInt(arg) + 1] !== undefined) {
-                var parallel_temp = parseInt(server_args[parseInt(arg) + 1]);
-                if (!isNaN(parallel_temp)) {
-                    max_processing = parallel_temp;
-                }
-            }
-            break;
-    }
-}
-
-function checkAndCreateDirectory(foldername) {
-    fs.exists(foldername, function(exists) {
-        if (!exists) {
-            fs.mkdirSync(foldername);
-        }
-    });
-}
-
-checkAndCreateDirectory(queued_folder);
-checkAndCreateDirectory(temp_folder);
-checkAndCreateDirectory(completed_folder);
-
 /**
  * If the server is terminated when the files are still in queue or being converted,
  * this function re-queues those files at the startup.
@@ -78,8 +16,6 @@ function reQueueFiles() {
     });
 }
 reQueueFiles();
-
-console.log('Starting FFMPEG Server on ' + transcoder_ip + ':' + transcoder_port);
 
 function queueHandler() {
     if (processing >= max_processing) {
