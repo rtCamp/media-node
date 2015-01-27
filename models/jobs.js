@@ -4,7 +4,7 @@
 * Status Codes:
 queued      - File has been successfully recieved
 processing  - File is being transcoded
-success     - File is transcoded successfully and is ready for download
+completed   - File is transcoded successfully and is ready for download
 error       - There was an error in transcoding
 
 following not used
@@ -17,13 +17,15 @@ following not used
 
 module.exports = function(sequelize, DataTypes) {
     var Jobs = sequelize.define("Job", {
-        original_file       :   DataTypes.STRING,
-        transcoded_file     :   DataTypes.STRING,
+        api_job_id          :   DataTypes.INTEGER,
+        original_file_path  :   DataTypes.STRING,
+        original_file_url   :   DataTypes.STRING,
+        request_formats     :   DataTypes.STRING,   //mp4, mp3 and thumbnails
         status              : { type: DataTypes.STRING, defaultValue: 'queued'},
-        output_type         :   DataTypes.INTEGER,
+        bandwidth           :   DataTypes.INTEGER,
+        thumb_count         :   DataTypes.INTEGER,
         callback_url        :   DataTypes.TEXT,
         duration            :   DataTypes.INTEGER,
-        thumbs              :   DataTypes.INTEGER
     });
 
     return Jobs;
