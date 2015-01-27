@@ -2,3 +2,4 @@ files
 config.json
 data.db
 node_modules
+.DS_Store

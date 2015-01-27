@@ -16,8 +16,8 @@ var http = require("http")
 var httpsync = require('httpsync')
 
 //local modules
-var job = require('./db.js');
-var encode = require('./encode.js');
+var job = require('./lib/db.js');
+var encode = require('./lib/encode.js');
 
 // config
 var env = process.env.NODE_ENV || "development";
