@@ -254,7 +254,7 @@ function rtUpdateJobBandwidth(job_id, job_dir) {
                     bandwidth: dirsize
                 },
                 {
-                    id: job_id
+                    where: {id: job_id}
                 }
             )
             .success(function() {
