@@ -95,7 +95,7 @@ function rtAPIGetJobs() {
                 });
             } //end of callback
         ) //end of http
-    rtProcessQueue(); //start processing local job queue    
+    rtProcessQueue(); //start processing local job queue
 }
 
 function rtAPIUpdateJob(job_id, field_name, field_value) {
@@ -292,7 +292,7 @@ function rtProcessQueue() {
                         console.log("request_formats is not set for Job #" + job.id)
                 }
                 //update bandwidth
-                rtUpdateJobBandwidth(job.id, job.original_file)
+                rtUpdateJobBandwidth(job.id, path.dirname(job.original_file))
 
                 console.log(job)
 
