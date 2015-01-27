@@ -253,16 +253,15 @@ function rtUpdateJobBandwidth(job_id, job_dir) {
         models.Job.update({
                     bandwidth: dirsize
                 },
-                // Where clause / criteria
                 {
-                    _id: job_id
+                    id: job_id
                 }
             )
             .success(function() {
-                console.log("Database updates successfully for job #" + job.id);
+                console.log("Database updates successfully for job #" + job_id);
             })
             .error(function(err) {
-                console.log("Database update failed for job #" + job.id);
+                console.log("Database update failed for job #" + job_id);
             })
     } // end of rtUpdateJobStatus
 
