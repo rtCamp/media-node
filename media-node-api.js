@@ -244,11 +244,14 @@ function rtUpdateJobStatus(job_id, job_status) {
     } // end of rtUpdateJobStatus
 
 function rtUpdateJobBandwidth(job_id, job_dir) {
+        var dirsize = 0;
+
         du(job_dir, function(err, size) {
             console.log('The size of' + path.dirname(job_dir) + ' is:', size, 'bytes')
+            dirsize = size;
         })
         models.Job.update({
-                    bandwidth: size
+                    bandwidth: dirsize
                 },
                 // Where clause / criteria
                 {
