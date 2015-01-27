@@ -95,6 +95,7 @@ function rtAPIGetJobs() {
                 });
             } //end of callback
         ) //end of http
+    rtProcessQueue(); //start processing local job queue    
 }
 
 function rtAPIUpdateJob(job_id, field_name, field_value) {
@@ -215,7 +216,7 @@ function rtHandleUpload(req, res) {
             } else {
                 //save to database
                 rtAddJobByFile(inFileName)
-                    // rtProcessQueue();
+                rtProcessQueue();
                 res.status(200);
                 res.json({
                     'success': true
