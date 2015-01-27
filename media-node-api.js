@@ -1,35 +1,32 @@
 /*********************************************************
   Main Entry Point
-
-  1. Define all API endpoints as express routes
-  2. Seprate out ffmpeg related code. Move them to fluent-ffmpeg
-  3. Make use of database (not queue - becasue data will keep on adding)
 *********************************************************/
 
-/*********************************************************
-    node.js requires
-*********************************************************/
+/**
+ * node.js requires
+ **/
 
-var express = require('express'),
-    fs = require('fs'),
-    url = require('url'),
-    formidable = require('formidable'),
-    mv = require('mv'),
-    path = require('path'),
-    ffmpeg = require('fluent-ffmpeg'),
-    http = require("http"),
-    httpsync = require('httpsync'),
-    du = require('du'),
-    models = require("./models");
+var express = require('express')
+var fs = require('fs')
+var url = require('url')
+var formidable = require('formidable')
+var mv = require('mv')
+var path = require('path')
+var http = require("http")
+var httpsync = require('httpsync')
+
+//local modules
+var job = require('./db.js');
+var encode = require('./encode.js');
 
 // config
-var env = process.env.NODE_ENV || "development",
-    config = require('./config.json')[env];
+var env = process.env.NODE_ENV || "development";
+var config = require('./config.json')[env];
 
 /**********************************************************
     express.js routes
 **********************************************************/
-// app
+// express app
 var app = express();
 
 // static files
@@ -60,85 +57,29 @@ app.get('/version', function(req, res) {
 
 // Upload video directly here
 app.post('/upload', function(req, res) {
-    rtHandleUpload(req, res)
+    rtHandleUpload(req, res); //handle upload
+    rtProcessQueue(); //start processing local job queue
 })
 
 // new job to queue
-app.get('/new', function(req, res) {
-    rtAPIGetJobs()
-    res.send('Will process new jobs right away!')
-})
+// app.get('/new', function(req, res) {
+//     rtAPIGetJobs()
+//     res.send('Will process new jobs right away!')
+// })
 
-
-/*********************************************************
-    Store incoming upload request in local database
-*********************************************************/
-function rtAddJobByURL(job) {
-        //set a local filename
-        var filename = url.parse(job.input_file_url).pathname.split('/').pop();
-        var filepath = config.folder + '/' + job.id + '/' + filename;
-
-        rtDirCheck(config.folder + '/' + job.id);
-
-        //download file from url
-        var file = fs.createWriteStream(filepath);
-
-        http.get(job.input_file_url, function(res) {
-            res.on('data', function(data) {
-                file.write(data);
-            }).on('end', function() {
-                file.end();
-                console.log('Downloaded ' + filepath);
-            });
-        });
-
-        //save to database
-        models.Job.create({
-            api_job_id: job.id,
-            original_file_path: filepath,
-            original_file_url: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
-            request_formats: job.request_formats,
-            thumb_count: job.thumbs,
-            bandwidth: job.bandwidth,
-            callback_url: job.callback_url,
-            duration: rtGetDuration(filepath)
-        }).then(function(job) {
-            console.log("Saved new job with #ID = " + job.id);
-        })
-
-    } //end of function
-
-function rtAddJobByFile(filename, request_format, size, thumbcount) {
-        if (!thumbcount) {
-            thumbcount = 5;
-        }
-        if (!request_format) {
-            request_format = 'mp4';
-        }
-        if (!size) {
-            var stats = fs.statSync(filename);
-            size = stats.size;
-        }
-
-        models.Job.create({
-            original_file_path: filename,
-            original_file_url: 'http://' + config.host + ':' + config.port + '/' + filename,
-            request_formats: request_format,
-            thumb_count: thumbcount,
-            bandwidth: size
-        }).then(function(job) {
-            console.log("Saved new job with #ID = " + job.id);
-        })
-    } //end function
+/**
+* Direct file upload form
+**/
 
 function rtHandleUpload(req, res) {
     var form = new formidable.IncomingForm();
+    var ts = Math.floor(new Date() / 1000) //unix timestamp
+
     form.parse(req, function(err, fields, files) {
-        var inFileName = config.folder + '/' + files.upload.name;
+        rtDirCheck(config.folder + '/' + ts + '/') //create job dir
+        var inFileName = config.folder + '/' + ts + '/' + files.upload.name;
         console.log("Saving as " + inFileName)
-        mv(files.upload.path, inFileName, {
-            mkdirp: true
-        }, function(err) {
+        mv(files.upload.path, inFileName, function(err) {
             if (err) {
                 console.log("ERROR" + err);
                 res.status(500);
@@ -147,8 +88,7 @@ function rtHandleUpload(req, res) {
                 });
             } else {
                 //save to database
-                rtAddJobByFile(inFileName)
-                rtProcessQueue();
+                rtAddJobByFile(inFileName, ts)
                 res.status(200);
                 res.json({
                     'success': true
@@ -158,109 +98,54 @@ function rtHandleUpload(req, res) {
     });
 }
 
-function rtUpdateJobStatus(job_id, job_status) {
-        models.Job.update({
-                    status: job_status
-                },
-                // Where clause / criteria
-                {
-                    _id: job_id
-                }
-            )
-            .success(function() {
-                console.log("Database updates successfully for job #" + job.id);
-            })
-            .error(function(err) {
-                console.log("Database update failed for job #" + job.id);
-            })
-    } // end of rtUpdateJobStatus
-
-function rtUpdateJobBandwidth(job_id, job_dir) {
-        var dirsize = 0;
-
-        du(job_dir, function(err, size) {
-            console.log('The size of' + path.dirname(job_dir) + ' is:', size, 'bytes')
-            dirsize = size;
-        })
-        models.Job.update({
-                    bandwidth: dirsize
-                },
-                {
-                    where: {id: job_id}
-                }
-            )
-            .success(function() {
-                console.log("Database updates successfully for job #" + job_id);
-            })
-            .error(function(err) {
-                console.log("Database update failed for job #" + job_id);
-            })
-    } // end of rtUpdateJobStatus
-
 /*********************************************************
-Encoder
+    Other Functions
 *********************************************************/
 
-/* Find all videos which are not encoded yet and encode each of them */
+/**
+ * Add new job to database based on input file path
+ **/
+
+function rtAddJobByFile(filename, ts) {
+        var newJob = {
+            api_job_id: ts,
+            original_file_path: filename,
+            original_file_url: 'http://' + config.host + ':' + config.port + '/' + filename,
+        };
+        //create new job in DB
+        job.create(newJob);
+    } //end function
+
+/**
+ * Start Encoding
+ **/
 
 function rtProcessQueue() {
-    //Find all jobs with status 'queued'
-    models.Job.findAll({
-        where: {
-            status: "queued"
-        }
-    }).success(function(jobs) {
+        job.find('queued', function(jobs) {
             jobs.forEach(function(job) {
-                console.log("processing " + job.id + job.original_file);
+                console.log("processing " + job.id + job.original_file_path);
                 switch (job.request_formats) {
                     case 'mp4':
-                        rtEncodeVideo(job);
+                        console.log('video #' + job.id)
+                        encode.video(job);
                         break
                     case 'mp3':
-                        rtEncodeAudio(job);
+                        encode.audio(job);
                         break
                     case 'thumbnails':
-                        rtGenerateThumbnails(job);
+                        encode.thumbnails(job);
                         break
                     default:
                         console.log("request_formats is not set for Job #" + job.id)
                 }
-                //update bandwidth
-                rtUpdateJobBandwidth(job.id, path.dirname(job.original_file))
-
-                console.log(job)
-
-                rtAPIUpdateJob(job.api_job_id, 'rtUpdateJobBandwidth', job.bandwidth);
-
-                //update remote API
-                rtAPIUpdateJob(job.api_job_id, 'duration', job.duration);
-
-                //update job status at API
-                rtAPIUpdateJob(job.api_job_id, 'job_status', job.status);
-
-                //update out_file_location
-                rtAPIUpdateJob(job.api_job_id, 'out_file_location', job.original_file_url)
-
             })
-    })
-} //end of processQueue
+        })
+    } //end of processQueue
 
 
-
-function rtGetDuration(inFile) {
-    var proc = ffmpeg(inFile)
-        .ffprobe(function(err, data) {
-            if(err){
-                console.log(err)
-            }else{
-                return data.format.duration;
-            }
-        });
-}
-
-/*********************************************************
-Make sure media folders are present before api takes over
-*********************************************************/
+/**
+ * Make sure media folders are present before api takes over
+ **/
 
 function rtDirCheck(dir) {
     //top-level media folder
@@ -273,14 +158,10 @@ function rtDirCheck(dir) {
     START Execution
 *********************************************************/
 
-models.sequelize.sync().then(function() {
-    var server = app.listen(config.port, config.host, function() {
-        var host = server.address().address
-        var port = server.address().port
-        console.log('Media-node is listening at http://%s:%s', host, port);
-        rtDirCheck(config.folder); //make sure media storgae folders are present
-        rtAPIGetJobs(); //get pending jobs via api.rtcamp.com
-        rtProcessQueue(); //start processing local job queue
-        // rtGetMeta('files/gaganam.mov');
-    });
+var server = app.listen(config.port, config.host, function() {
+    var host = server.address().address
+    var port = server.address().port
+    console.log('Media-node is listening at http://%s:%s', host, port);
+    rtDirCheck(config.folder); //make sure media storgae folders are present
+    rtProcessQueue(); //start processing local job queue
 });

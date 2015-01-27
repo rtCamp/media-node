@@ -1,4 +1,9 @@
 var Sequelize = require('sequelize')
+var path = require('path')
+var fs = require('fs')
+var du = require('du')
+var fluentffmpeg = require('fluent-ffmpeg')
+
 var env = process.env.NODE_ENV || "development";
 var config = require(__dirname + '/config.json')[env];
 
@@ -15,18 +20,27 @@ sequelize
     })
 
 var Job = sequelize.define("Job", {
-    api_job_id: Sequelize.INTEGER,
+    api_job_id: {
+        type: Sequelize.INTEGER,
+        defaultValue: Math.floor(new Date() / 1000) //unix timestamp
+    },
     original_file_path: Sequelize.STRING,
     original_file_url: Sequelize.STRING,
-    request_formats: Sequelize.STRING, //mp4, mp3 and thumbnails
-    status: {
-        type: Sequelize.STRING,
+    request_formats: { //mp4, mp3 and thumbnails
+        type: Sequelize.ENUM('mp4', 'mp3', 'thumbnails'),
+        defaultValue: 'mp4'
+    },
+    status: { // queued, completed, processing, error
+        type: Sequelize.ENUM('queued', 'completed', 'processing', 'error'),
         defaultValue: 'queued'
     },
     bandwidth: Sequelize.INTEGER,
-    thumb_count: Sequelize.INTEGER,
+    thumb_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 5
+    },
     callback_url: Sequelize.TEXT,
-    duration: Sequelize.FLOAT,
+    duration: Sequelize.FLOAT
 });
 
 sequelize
@@ -53,20 +67,36 @@ sequelize
  **/
 
 exports.create = function(job) {
-        Job.create({
-                api_job_id: job.api_job_id,
-                original_file_path: job.original_file_path,
-                original_file_url: job.original_file_url,
-                request_formats: job.request_formats,
-                thumb_count: job.thumb_count,
-                bandwidth: job.bandwidth,
-                callback_url: job.callback_url,
-                duration: job.duration
-            })
-            .then(
-                function(job) {
-                    console.log("Saved new job with #ID = " + job.id);
+        //get file size
+        if (typeof job.bandwidth === 'undefined') {
+            var stats = fs.statSync(job.original_file_path);
+            job.bandwidth = stats.size;
+            newjob.bandwidth = stats.size;
+        }
+
+        //check duration
+        if (typeof job.duration === 'undefined') {
+            fluentffmpeg(job.original_file_path)
+                .ffprobe(function(err, data) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        job.duration = data.format.duration
+                        // console.log("Job duration is " + job.duration)
+                        Job.create(job)
+                            .then(
+                                function(job) {
+                                    console.log("Saved new job with #ID = " + job.id);
+                                })
+                    }
                 })
+        } else {
+            Job.create(job)
+                .then(
+                    function(job) {
+                        console.log("Saved new job with #ID = " + job.id);
+                    })
+        }
     } //end of create
 
 /**
@@ -102,10 +132,10 @@ exports.updateStatus = function(job_id, job_status) {
                     id: job_id
                 }
             })
-            .success(function() {
+            .then(function() {
                 console.log("Status updated successfully for job #" + job_id);
             })
-            .error(function(err) {
+            .catch(function(err) {
                 console.log("Status update failed for job #" + job_id);
             })
     } // end of upateStatus
@@ -116,20 +146,23 @@ exports.updateStatus = function(job_id, job_status) {
  * @param job_bandwidth bandwidth used by this job
  **/
 
-exports.updateBandwidth = function(job_id, job_bandwidth) {
-        Job.update({
-                bandwidth: job_bandwidth
-            }, {
-                where: {
-                    id: job_id
-                }
-            })
-            .success(function() {
-                console.log("Bandwidth updated successfully for job #" + job_id);
-            })
-            .error(function(err) {
-                console.log("Bandwidth update failed for job #" + job_id);
-            })
+exports.updateBandwidth = function(job_id, job_dir) {
+        console.log('Calculating the size of' + job_dir)
+        du(job_dir, function(err, size) {
+            console.log('The size of' + job_dir + ' is:', size, 'bytes')
+            Job.update({
+                    bandwidth: size
+                }, {
+                    where: {
+                        id: job_id
+                    }
+                })
+                .then(function() {
+                    console.log("Bandwidth updated successfully for job #" + job_id);
+                    console.log("Bandwidth update failed for job #" + job_id);
+                })
+        })
+
     } // end of upateBandwidth
 
 
@@ -139,18 +172,26 @@ exports.updateBandwidth = function(job_id, job_bandwidth) {
  * @param job_duration duration
  **/
 
-exports.updateDuration = function(job_id, job_duration) {
-        Job.update({
-                duration: job_duration
-            }, {
-                where: {
-                    id: job_id
+exports.updateDuration = function(job_id, job_file) {
+        fluentffmpeg(job_file)
+            .ffprobe(function(err, data) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    Job.update({
+                            duration: data.format.duration
+                        }, {
+                            where: {
+                                id: job_id
+                            }
+                        })
+                        .then(function() {
+                            console.log("Duration updated successfully for job #" + job_id);
+                        })
+                        .catch(function(err) {
+                            console.log("Duration update failed for job #" + job_id);
+                        })
                 }
-            })
-            .success(function() {
-                console.log("Duration updated successfully for job #" + job_id);
-            })
-            .error(function(err) {
-                console.log("Duration update failed for job #" + job_id);
-            })
+            });
+
     } // end of upateBandwidth

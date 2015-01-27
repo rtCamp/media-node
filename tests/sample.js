@@ -2,7 +2,7 @@ var job = require('../db.js');
 
 var sampleJob = {};
 
-sampleJob.api_job_id = 123
+sampleJob.api_job_id = 22
 sampleJob.original_file_path = 'hello.jpg'
 sampleJob.original_file_url = "wow"
 sampleJob.request_formats = "mp3"
@@ -20,5 +20,8 @@ job.find('queued', function(jobs){
 })
 
 job.updateStatus(2,'completed')
-job.updateBandwidth(2,231345)
-job.updateDuration(2,4.5)
+// job.updateBandwidth(2,231345)
+// job.updateDuration(2,4.5)
+
+console.log("JOBBBBBBBSSSSS")
+console.log(job)

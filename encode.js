@@ -1,7 +1,8 @@
 var fluentffmpeg = require('fluent-ffmpeg')
+var job = require('./db.js')
+var path = require('path')
 
 var env = process.env.NODE_ENV || "development"
-
 var config = require(__dirname + '/config.json')[env]
 
 //instance of fluent-ffmpeg
@@ -12,29 +13,32 @@ var ffmpeg = fluentffmpeg();
  **/
 
 ffmpeg.on('start', function(commandLine) {
-    console.log('Command: ' + commandLine);
-    rtUpdateJobStatus(job.id, 'processing');
+    console.log('Command: ' + commandLine)
+    job.updateStatus(j.id, 'processing')
 })
 
 ffmpeg.on('end', function(err, stdout, stderr) {
     if (err) {
         console.log('ERROR ' + err)
-        rtUpdateJobStatus(job.id, 'error');
+        job.updateStatus(j.id, 'error')
     } else {
         console.log('SUCCESS');
-        rtUpdateJobStatus(job.id, 'succes');
+        //update status
+        job.updateStatus(j.id, 'completed')
+            //update bandwidth
+        job.updateBandwidth(j.id, path.dirname(j.original_file_path))
     }
     console.log(stdout)
 })
 
 ffmpeg.on('progress', function(progress) {
     console.log('Processing: ' + progress.percent.toFixed(2) + '% done');
-    rtUpdateJobStatus(job.id, 'processing');
+    job.updateStatus(j.id, 'processing')
 })
 
-ffmpeg.on('error', function(err) {
-    console.log('ERROR ' + err);
-    rtUpdateJobStatus(job.id, 'error');
+ffmpeg.on('error', function(err, stdout, stderr) {
+    console.log(err);
+    job.updateStatus(j.id, 'error')
     console.log(stdout)
 })
 
@@ -44,10 +48,42 @@ ffmpeg.on('error', function(err) {
  * @param - <job> object
  **/
 
-export.video = function(job) {
-        var inFile = job.original_file_path
+exports.video = function(j) {
+        var inFile = j.original_file_path
+        var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
             // console.log(outFile);
-        ffmpeg.input(inFile)
+
+        var command = fluentffmpeg(inFile)
+
+        .on('start', function(commandLine) {
+            console.log('Command: ' + commandLine)
+            job.updateStatus(j.id, 'processing')
+        })
+
+        .on('end', function(err, stdout, stderr) {
+            if (err) {
+                console.log('ERROR ' + err)
+                job.updateStatus(j.id, 'error')
+            } else {
+                console.log('SUCCESS');
+                //update status
+                job.updateStatus(j.id, 'completed')
+                //update bandwidth
+                job.updateBandwidth(j.id, path.dirname(j.original_file_path))
+            }
+            // console.log(stdout)
+        })
+
+        .on('progress', function(progress) {
+            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            // job.updateStatus(j.id, 'processing')
+        })
+
+        .on('error', function(err, stdout, stderr) {
+            console.log(err);
+            job.updateStatus(j.id, 'error')
+            console.log(stdout)
+        })
 
         //mp4
         .output(outFile + '.mp4')
@@ -83,7 +119,7 @@ export.video = function(job) {
 
         //take screenshots
         .screenshots({
-                count: job.thumb_count,
+                count: j.thumb_count,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })
@@ -96,11 +132,41 @@ export.video = function(job) {
  * @param - <job> object
  **/
 
-export.audio = function(job) {
-        var inFile = job.original_file_path
+exports.audio = function(j) {
+        var inFile = j.original_file_path
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        ffmpeg.input(inFile)
+        var command = fluentffmpeg(inFile)
+
+        .on('start', function(commandLine) {
+            console.log('Command: ' + commandLine)
+            job.updateStatus(j.id, 'processing')
+        })
+
+        .on('end', function(err, stdout, stderr) {
+            if (err) {
+                console.log('ERROR ' + err)
+                job.updateStatus(j.id, 'error')
+            } else {
+                console.log('SUCCESS');
+                //update status
+                job.updateStatus(j.id, 'completed')
+                //update bandwidth
+                job.updateBandwidth(j.id, path.dirname(j.original_file_path))
+            }
+            // console.log(stdout)
+        })
+
+        .on('progress', function(progress) {
+            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            // job.updateStatus(j.id, 'processing')
+        })
+
+        .on('error', function(err, stdout, stderr) {
+            console.log(err);
+            job.updateStatus(j.id, 'error')
+            console.log(stdout)
+        })
 
         //mp3
         .output(outFile + '.mp3')
@@ -127,15 +193,45 @@ export.audio = function(job) {
  * @param - <job> object
  **/
 
-export.thumbnails = function(job) {
-        var inFile = job.original_file_path
+exports.thumbnails = function(j) {
+        var inFile = j.original_file_path
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        ffmpeg.input(inFile)
+        var command = fluentffmpeg(inFile)
+
+        .on('start', function(commandLine) {
+            console.log('Command: ' + commandLine)
+            job.updateStatus(j.id, 'processing')
+        })
+
+        .on('end', function(err, stdout, stderr) {
+            if (err) {
+                console.log('ERROR ' + err)
+                job.updateStatus(j.id, 'error')
+            } else {
+                console.log('SUCCESS');
+                //update status
+                job.updateStatus(j.id, 'completed')
+                //update bandwidth
+                job.updateBandwidth(j.id, path.dirname(j.original_file_path))
+            }
+            // console.log(stdout)
+        })
+
+        .on('progress', function(progress) {
+            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            // job.updateStatus(j.id, 'processing')
+        })
+
+        .on('error', function(err, stdout, stderr) {
+            console.log(err);
+            job.updateStatus(j.id, 'error')
+            console.log(stdout)
+        })
 
         //take screenshots
         .screenshots({
-                count: job.thumb_count,
+                count: j.thumb_count,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })

@@ -66,3 +66,63 @@ function rtAPIFireCallback(callback_url, output) {
     req.write(data);
     req.end();
 }
+
+rtAPIUpdateJob(job.api_job_id, 'rtUpdateJobBandwidth', job.bandwidth);
+
+//update remote API
+rtAPIUpdateJob(job.api_job_id, 'duration', job.duration);
+
+//update job status at API
+rtAPIUpdateJob(job.api_job_id, 'job_status', job.status);
+
+//update out_file_location
+rtAPIUpdateJob(job.api_job_id, 'out_file_location', job.original_file_url)
+
+/**
+* Add new job to database based on input file url
+**/
+
+function rtAddJobByURL(job) {
+    //get filesize
+    var newJob = {
+        api_job_id: ts,
+        original_file_path: filename,
+        original_file_url: 'http://' + config.host + ':' + config.port + '/' + filename,
+        bandwidth: size
+    };
+    //create new job in DB
+    job.create(newJob);
+
+    //set a local filename
+    var filename = url.parse(job.input_file_url).pathname.split('/').pop();
+    var filepath = config.folder + '/' + job.id + '/' + filename;
+
+    rtDirCheck(config.folder + '/' + job.id);
+
+    //download file from url
+    var file = fs.createWriteStream(filepath);
+
+    http.get(job.input_file_url, function(res) {
+        res.on('data', function(data) {
+            file.write(data);
+        }).on('end', function() {
+            file.end();
+            console.log('Downloaded ' + filepath);
+        });
+    });
+
+    //save to database
+    models.Job.create({
+        api_job_id: job.id,
+        original_file_path: filepath,
+        original_file_url: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
+        request_formats: job.request_formats,
+        thumb_count: job.thumbs,
+        bandwidth: job.bandwidth,
+        callback_url: job.callback_url,
+        duration: rtGetDuration(filepath)
+    }).then(function(job) {
+        console.log("Saved new job with #ID = " + job.id);
+    })
+
+} //end of function
