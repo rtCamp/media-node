@@ -504,7 +504,7 @@ models.sequelize.sync().then(function() {
         console.log('Media-node is listening at http://%s:%s', host, port);
         rtDirCheck(config.folder); //make sure media storgae folders are present
         rtAPIGetJobs(); //get pending jobs via api.rtcamp.com
-        // rtProcessQueue(); //start processing local job queue
+        rtProcessQueue(); //start processing local job queue
         // rtGetMeta('files/gaganam.mov');
     });
 });
