@@ -13,7 +13,6 @@ var formidable = require('formidable')
 var mv = require('mv')
 var path = require('path')
 var http = require("http")
-var httpsync = require('httpsync')
 
 //local modules
 var job = require('./lib/db.js');
