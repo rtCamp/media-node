@@ -15,17 +15,17 @@ api.getjobs(function(res) {
     console.log("===================================================")
     console.log("START processing queue")
     console.log("===================================================")
-    queue.encode(res)
-    // queue.process(function(job) {
-    //     //update bandwidth
-    //     api.updatejob(job.api_job_id, 'bandwidth', job.bandwidth)
-    //     // update remote API
-    //     api.updatejob(job.api_job_id, 'duration', job.duration)
-    //     //update job status at API
-    //     api.updatejob(job.api_job_id, 'job_status', job.status)
-    //     //update out_file_location
-    //     api.updatejob(job.api_job_id, 'out_file_location', job.original_file_url)
-    //     //fire callback
-    //     api.callback(job)
-    // });
+    queue.encode(res,function(job) {
+            //update bandwidth
+            api.updatejob(job.api_job_id, 'bandwidth', job.bandwidth)
+            // update remote API
+            api.updatejob(job.api_job_id, 'duration', job.duration)
+            //update job status at API
+            api.updatejob(job.api_job_id, 'job_status', job.status)
+            //update out_file_location
+            api.updatejob(job.api_job_id, 'out_file_location', job.original_file_url)
+            //fire callback
+            api.callback(job)
+        })
+    // queue.process();
 })
