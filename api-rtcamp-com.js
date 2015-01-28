@@ -1,6 +1,6 @@
 var api = require('./lib/api.js')
 var queue = require('./lib/queue.js')
-var util = require('./util.js')
+var util = require('./lib/util.js')
 
 //config
 var env = process.env.NODE_ENV || "development"
