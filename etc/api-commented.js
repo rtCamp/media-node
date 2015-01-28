@@ -166,3 +166,35 @@ function rtAddJobByURL(job) {
 
 //fetch API
 rtAPIGetJobs()
+
+
+/**
+* Download file by from a URL and return local path
+**/
+
+// function rtDownloadFile(job_id, job_url) {
+//     console.log("START: Download File for Job # " + job_id + " from " +  job_url )
+//
+//     //set a local filename
+//     var filename = url.parse(job_url).pathname.split('/').pop();
+//     var filepath = config.folder + '/' + job_id + '/' + filename;
+//
+//     // dir for this job files
+//     util.makedir(config.folder + '/' + job_id);
+//
+//     //download file from url
+//     var file = fs.createWriteStream(filepath);
+//
+//     request(job_url, function(error, response, body) {
+//         if (!error && response.statusCode == 200) {
+//             file.write(body)
+//             file.end()
+//             console.log('Downloaded ' + filepath)
+//         } else {
+//             console.log(error)
+//         }
+//     }) //end of request
+//
+//     console.log("END: Download File for Job # " + job_id + " to " +  filepath )
+//     return filepath;
+// }
