@@ -1,3 +1,4 @@
+var dbjob = require('./lib/db.js')
 var api = require('./lib/api.js')
 var queue = require('./lib/queue.js')
 var util = require('./lib/util.js')
@@ -9,7 +10,16 @@ var config = require(__dirname + '/config.json')[env]
 //make sure upload folder exist
 util.makedir(config.folder);
 
-//fetch new jobs via API
+//
+// dbjob.find('completed', function(jobs) {
+//     console.log("Found Jobs")
+//         // console.log(jobs)
+//     jobs.forEach(function(job) {
+//         api.callback(job)
+//     })
+// })
+
+fetch new jobs via API
 api.getjobs(function(res) {
     //process new jobs found in API
     console.log("===================================================")
