@@ -29,7 +29,8 @@ var config = require('./config.json')[env];
     express.js routes
 **********************************************************/
 // express app
-var app = express();
+var app = module.exports = express(); //now media-node.js can be required to bring app into any file
+
 
 // static files
 app.use(express.static('/files', __dirname + '/files'));
@@ -144,16 +145,16 @@ function rtProcessQueue() {
         })
     } //end of processQueue
 
-
+// exports.app = app
 
 /*********************************************************
     START Execution
 *********************************************************/
 
-var server = app.listen(config.port, config.host, function() {
-    var host = server.address().address
-    var port = server.address().port
-    console.log('Media-node is listening at http://%s:%s', host, port);
-    util.makedir(config.folder); //make sure media storgae folders are present
-    queue.process(); //start processing local job queue
-});
+// var server = app.listen(config.port, config.host, function() {
+//     var host = server.address().address
+//     var port = server.address().port
+//     console.log('Media-node is listening at http://%s:%s', host, port);
+//     util.makedir(config.folder); //make sure media storgae folders are present
+//     queue.process(); //start processing local job queue
+// });
