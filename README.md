@@ -49,7 +49,7 @@ If you are running media-node on 127.0.0.1 on remote server, then you should cre
 FFMPEG Commands used
 =====================
 
-* source: https://blog.mediacru.sh/2013/12/23/The-right-way-to-encode-HTML5-video.html * 
+* source: https://blog.mediacru.sh/2013/12/23/The-right-way-to-encode-HTML5-video.html *
 
 ### mp4
 ```
@@ -79,4 +79,10 @@ ffmpeg -i input.ext -acodec libmp3lame -q:a 0 -map 0:a:0 output.mp3
 ### ogg
 ```
 ffmpeg -i input.ext -acodec libvorbis -q:a 10 -map 0:a:0 output.ogg
+```
+
+### ffprobe
+
+```
+ffprobe -of json -show_streams -show_format /path/to/file.avi
 ```

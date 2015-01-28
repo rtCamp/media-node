@@ -8,6 +8,7 @@
         "port":"4444",
         "folder":"./files",
 
-        "apiserver": "http://api.rtcamp.com/server/1/"        
+        "apiserver": "http://api.rtcamp.com/",
+        "apiserverid" : "1"
     }
 }

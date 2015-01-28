@@ -18,6 +18,8 @@ var httpsync = require('httpsync')
 //local modules
 var job = require('./lib/db.js');
 var encode = require('./lib/encode.js');
+var util = require('./lib/util.js');
+var queue = require('./lib/queue.js');
 
 // config
 var env = process.env.NODE_ENV || "development";
@@ -143,16 +145,6 @@ function rtProcessQueue() {
     } //end of processQueue
 
 
-/**
- * Make sure media folders are present before api takes over
- **/
-
-function rtDirCheck(dir) {
-    //top-level media folder
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
-}
 
 /*********************************************************
     START Execution
@@ -162,6 +154,6 @@ var server = app.listen(config.port, config.host, function() {
     var host = server.address().address
     var port = server.address().port
     console.log('Media-node is listening at http://%s:%s', host, port);
-    rtDirCheck(config.folder); //make sure media storgae folders are present
-    rtProcessQueue(); //start processing local job queue
+    util.makedir(config.folder); //make sure media storgae folders are present
+    queue.process(); //start processing local job queue
 });
