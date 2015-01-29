@@ -1,6 +1,7 @@
 files
 config.json
-data.db
+*.db
 node_modules
 .DS_Store
 js/tests/data/
+__pycache__
