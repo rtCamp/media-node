@@ -3,4 +3,4 @@ config.json
 data.db
 node_modules
 .DS_Store
-tests/data/
+js/tests/data/
