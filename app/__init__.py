@@ -15,5 +15,5 @@ from app import views, models
 # create UPLOAD_FOLDER if it doesn't exists
 ensuredir(app.config['UPLOAD_FOLDER'])
 
-#create db
+# create db
 db.create_all()
