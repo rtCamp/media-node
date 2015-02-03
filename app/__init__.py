@@ -1,9 +1,9 @@
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.sqlalchemy import models_committed
 from .util import ensuredir
+from .encoder import Encoder
 from pprint import pprint
-import os
-
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)

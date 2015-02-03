@@ -3,6 +3,7 @@ config.json
 *.db
 node_modules
 .DS_Store
-js/tests/data/
+tests/data
 __pycache__
 flask
+*.pyc

@@ -1,9 +1,10 @@
 ####################################
 # database
 ####################################
-
+from pprint import pprint
 from app import db
 import time
+from flask.ext.sqlalchemy import models_committed
 
 
 class Job(db.Model):
@@ -28,7 +29,7 @@ class Job(db.Model):
         db.Enum('queued', 'completed', 'processing', 'error'),
         default='queued')
     bandwidth = db.Column(db.Integer)
-    thumb_count = db.Column(db.Integer)
+    thumb_count = db.Column(db.Integer, default=0)
     callback_url = db.Column(db.String(255))
     duration = db.Column(db.Float)
 
@@ -51,4 +52,4 @@ class Job(db.Model):
 
     def __repr__(self):
         """ String representation of a Job object """
-        return '<Job File: %r>' % (self.original_file_path)
+        return '<Job File: %r>' % (self.file_path)
