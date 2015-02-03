@@ -93,7 +93,7 @@ function rtAddJobByFile(filename, fields) {
 
         console.log('Tryin to save new job ')
         console.log(newJob)
-        //create new job in DB
+            //create new job in DB
         dbjob.create(newJob, function(job) {
             console.log("New job created")
             console.log(job)
@@ -146,16 +146,20 @@ function fireCallback(job) {
                 } //end of function
             ) //end of request.post
     } //end of rtAPIFireCallback
-    /*********************************************************
-        START Execution
-    *********************************************************/
 
-var server = app.listen(config.port, config.host, function() {
-    var host = server.address().address
-    var port = server.address().port
-    console.log('Media-node is listening at http://%s:%s', host, port);
-    util.makedir(config.folder); //make sure media storgae folders are present
-    queue.process(function(job) {
-        fireCallback(job)
-    }); //start processing local job queue
-});
+
+/*********************************************************
+    START Execution
+*********************************************************/
+
+dbjob.init(function() {
+        var server = app.listen(config.port, config.host, function() {
+            var host = server.address().address
+            var port = server.address().port
+            console.log('Media-node is listening at http://%s:%s', host, port);
+            util.makedir(config.folder); //make sure media storgae folders are present
+            queue.process(function(job) {
+                fireCallback(job)
+            }); //start processing local job queue
+        });
+    }) //end of dbjob
