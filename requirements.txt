@@ -1,0 +1,14 @@
+Flask==0.10.1
+Flask-SQLAlchemy==2.0
+Jinja2==2.7.3
+MarkupSafe==0.23
+SQLAlchemy==0.9.8
+Tempita==0.5.2
+Werkzeug==0.9.6
+decorator==3.4.0
+itsdangerous==0.24
+numpy==1.9.1
+pbr==0.10.7
+six==1.9.0
+sqlalchemy-migrate==0.9.4
+sqlparse==0.1.14
