@@ -5,6 +5,7 @@ from .models import Job
 from .util import ensuredir
 from .encoder import Encoder
 from .queue import Queue
+
 from werkzeug import secure_filename
 from pprint import pprint
 import time
@@ -78,15 +79,4 @@ def uploaded_file(filename):
 @app.route('/start/')
 def start_encoding():
     Queue.process('queued')
-
     return "hello"
-
-
-def on_models_committed(sender, changes):
-    for model, change in changes:
-        if change == 'insert':
-            print ("Hook Fired")
-            db.create_scoped_session()
-            Queue.process('queued')
-
-models_committed.connect(on_models_committed, sender=app)

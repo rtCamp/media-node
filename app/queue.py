@@ -1,12 +1,13 @@
 from .models import Job
 from .encoder import Encoder
 from pprint import pprint
+from app import queue_db
 
 
 class Queue():
 
     def process(self, status="queued"):
-        jobs = Job.query.filter_by(status=status)
+        jobs = queue_db.session.query(Job).filter_by(status=status)
         for job in jobs:
             pprint(vars(job))
             e = Encoder(job.file_path, job.thumb_count)
