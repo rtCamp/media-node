@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>Media-Node upload form</title>
+    </head>
+    <body>
+<form action="/upload" enctype="multipart/form-data" method="post">
+    <p>
+        <label for="callback_url">callback_url</label>
+        <input type="text" name="callback_url" value="http://requestb.in/qcq5dtqc">
+    </p>
+    <p>
+        <label for="media_type">media_type</label>
+        <input type="text" name="media_type" value="mp4">
+    </p>
+    <p>
+        <label for="media_id">media_id</label>
+        <input type="text" name="media_id" id="ts" value="">
+    </p>
+    <p>
+        <label for="thumbs">thumbs</label>
+        <input type="text" name="thumbs" value="3">
+    </p>
+    <p>
+        <input type="file" name="upload" multiple="multiple">
+    </p>
+    <input type="submit" value="Upload">
+</form>
+</body>
+<script type="text/javascript">
+    e = document.getElementById("ts");
+    e.value = Math.floor(Date.now() / 1000);
+</script>
+
+</html>
