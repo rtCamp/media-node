@@ -9,11 +9,11 @@ var formidable = require('formidable')
 var mv = require('mv')
 
 //local modules
-var dbjob = require('./lib/db.js');
-var encode = require('./lib/encode.js');
-var util = require('./lib/util.js');
-var queue = require('./lib/queue.js');
-var app = require('./lib/app.js');
+var dbjob = require('./app/db.js');
+var encode = require('./app/encode.js');
+var util = require('./app/util.js');
+var queue = require('./app/queue.js');
+var app = require('./app/app.js');
 
 // config
 var env = process.env.NODE_ENV || "development";

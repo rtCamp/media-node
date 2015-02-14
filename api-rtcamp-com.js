@@ -1,7 +1,7 @@
-var dbjob = require('./lib/db.js')
-var api = require('./lib/api.js')
-var queue = require('./lib/queue.js')
-var util = require('./lib/util.js')
+var dbjob = require('./app/db.js')
+var api = require('./app/api.js')
+var queue = require('./app/queue.js')
+var util = require('./app/util.js')
 var app = require('./media-node.js')
 
 //config

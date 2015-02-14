@@ -8,8 +8,8 @@ var fs = require('fs')
 var url = require('url')
 var path = require('path')
 
-var dbjob = require('./lib/db.js')
-var util = require('./lib/util.js')
+var dbjob = require('./app/db.js')
+var util = require('./app/util.js')
 
 var env = process.env.NODE_ENV || "development"
 var config = require(__dirname + '/config.json')[env]
