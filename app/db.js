@@ -1,3 +1,20 @@
+/**
+    Database module
+
+    Usage:
+    ======
+
+    var db = require('./db.js');                    // create object
+
+    db.init(callback)                               // initialize db and create tables if not exist
+    db.find(status, callback)                       // find jobs with status
+    db.create(job, callback)                        // find jobs with status
+    db.updateStatus(job_id, new_status, callback)   // update status for a job
+    db.updateBandwidth(job_id, bandwidth, callback) // update bandwidth for a job
+    db.updateDuration(job_id, duration, callback)   // update duration for a job
+
+**/
+
 var Sequelize = require('sequelize')
 var path = require('path')
 var fs = require('fs')
@@ -7,8 +24,10 @@ var fluentffmpeg = require('fluent-ffmpeg')
 var env = process.env.NODE_ENV || "development";
 var config = require(__dirname + '/../config.json')[env];
 
+// create sequelize ORM ibject
 var sequelize = new Sequelize(config.database, config.username, config.password, config)
 
+// create JOB object (table schema)
 var Job = sequelize.define("Job", {
     api_job_id: {
         type: Sequelize.INTEGER,
@@ -17,11 +36,11 @@ var Job = sequelize.define("Job", {
     api_key_id: Sequelize.INTEGER,
     original_file_path: Sequelize.STRING,
     original_file_url: Sequelize.STRING,
-    request_formats: { //mp4, mp3 and thumbnails
+    request_formats: {
         type: Sequelize.ENUM('mp4', 'mp3', 'thumbnails'),
         defaultValue: 'mp4'
     },
-    status: { // queued, completed, processing, error
+    status: {
         type: Sequelize.ENUM('queued', 'completed', 'processing', 'error'),
         defaultValue: 'queued'
     },
@@ -34,21 +53,17 @@ var Job = sequelize.define("Job", {
     duration: Sequelize.FLOAT
 });
 
+/**
+ * Initialize database. This will create database tables if they don't exist.
+ * @param callback
+ **/
+
 exports.init = function(callback) {
-    // sequelize
-    //     .authenticate()
-    //     .then(function(err) {
-    //         if (!!err) {
-    //             console.log('Unable to connect to the database:', err)
-    //         } else {
-    //             console.log('Connection has been established successfully.')
-    //         }
-    //     })
     sequelize
         .sync()
         .then(function() {
-                console.log('Database table ready!')
-                callback()
+            console.log('Database table ready!')
+            callback()
         })
 }
 
@@ -152,7 +167,7 @@ exports.updateStatus = function(job_id, job_status, callback) {
 /**
  * Update a job's bandwidth usage
  * @param job_id job id which needs update
- * @param job_bandwidth bandwidth used by this job
+ * @param job_bandwidth bandwidth in bytes used by this job
  **/
 
 exports.updateBandwidth = function(job_id, job_dir, callback) {
@@ -178,10 +193,10 @@ exports.updateBandwidth = function(job_id, job_dir, callback) {
 /**
  * Update a job's duration (time)
  * @param job_id job id which needs update
- * @param job_duration duration
+ * @param job_duration duration in seconds
  **/
 
-exports.updateDuration = function(job_id, job_file) {
+exports.updateDuration = function(job_id, job_file, callback) {
         fluentffmpeg(job_file)
             .ffprobe(function(err, data) {
                 if (err) {
@@ -196,6 +211,7 @@ exports.updateDuration = function(job_id, job_file) {
                         })
                         .then(function() {
                             console.log("Duration updated successfully for job #" + job_id);
+                            callback()
                         })
                         .catch(function(err) {
                             console.log("Duration update failed for job #" + job_id);

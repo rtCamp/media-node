@@ -1,7 +1,28 @@
+/**
+    encoder module - ffmpeg wrapper
+
+    Usage:
+    ======
+
+    var encoder = require('./encode.js');                           // create object
+
+    encoder.video(input_file_path, callback)                        // update status for a job
+    encoder.audio(input_file_path, callback)                        // update bandwidth for a job
+    encoder.thumbnails(input_file_path, thumb_count, callback)      // update duration for a job
+
+    TODO
+    =======
+    1. Add formats to audio & video
+    2. Add resolutions to thumbnails & video
+**/
+
+/**
+ * node.js requires
+ **/
 var fluentffmpeg = require('fluent-ffmpeg')
-var job = require('./db.js')
 var path = require('path')
 
+//config
 var env = process.env.NODE_ENV || "development"
 var config = require(__dirname + '/../config.json')[env]
 
@@ -9,51 +30,16 @@ var config = require(__dirname + '/../config.json')[env]
 var ffmpeg = fluentffmpeg();
 
 /**
- * Common event handlers
- **/
-
-ffmpeg.on('start', function(commandLine) {
-    console.log('Command: ' + commandLine)
-    job.updateStatus(j.id, 'processing')
-})
-
-ffmpeg.on('end', function(err, stdout, stderr) {
-    if (err) {
-        console.log('ERROR ' + err)
-        job.updateStatus(j.id, 'error')
-    } else {
-        console.log('SUCCESS');
-        //update status
-        job.updateStatus(j.id, 'completed')
-            //update bandwidth
-        job.updateBandwidth(j.id, path.dirname(j.original_file_path))
-    }
-    console.log(stdout)
-})
-
-ffmpeg.on('progress', function(progress) {
-    console.log('Processing: ' + progress.percent.toFixed(2) + '% done');
-    job.updateStatus(j.id, 'processing')
-})
-
-ffmpeg.on('error', function(err, stdout, stderr) {
-    console.log(err);
-    job.updateStatus(j.id, 'error')
-    console.log(stdout)
-})
-
-/**
  * Encode video to mp4, webm and ogv format. Also generate thumbnails
  * output files are generated in same folder in which input file is present
- * @param - <job> object
+ * @param - input_file_path
+ * @param - callback
  **/
 
-exports.video = function(j, callback) {
-        // console.log(j)
-        var inFile = j.original_file_path
+exports.video = function(inFile, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        console.log("Tyring to encode video # " + j.id);
+        console.log("Tyring to encode video # " + inFile);
         console.log(inFile);
         console.log(outFile);
 
@@ -61,42 +47,28 @@ exports.video = function(j, callback) {
 
         .on('start', function(commandLine) {
             console.log('Command: ' + commandLine)
-            job.updateStatus(j.id, 'processing', function() {
-                callback(j)
-            })
+            callback('processing');
         })
 
         .on('end', function(err, stdout, stderr) {
             if (err) {
                 console.log('ERROR ' + err)
-                job.updateStatus(j.id, 'error')
+                callback('error');
             } else {
                 console.log('SUCCESS');
-                //update status
-                job.updateStatus(j.id, 'completed', function() {
-                    //update bandwidth
-                    job.updateBandwidth(j.id, path.dirname(j.original_file_path), function() {
-                        //run callback
-                        callback()
-                    })
-                })
+                callback('success');
             }
-            // console.log(stdout)
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
-            // job.updateStatus(j.id, 'processing')
+            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            callback('processing');
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR occured when trying to encode video #" + j.id);
+            console.log("ERROR for job #" + inFile);
             console.log(err);
-            job.updateStatus(j.id, 'error', function() {
-                    //run callback
-                    callback(j)
-                })
-                // console.log(stdout)
+            callback('error');
         })
 
         //mp4
@@ -133,7 +105,7 @@ exports.video = function(j, callback) {
 
         //take screenshots
         .screenshots({
-                count: j.thumb_count,
+                count: thumb_count,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })
@@ -143,49 +115,41 @@ exports.video = function(j, callback) {
 /**
  * Encode audio to mp3 and ogg format.
  * output files are generated in same folder in which input file is present
- * @param - <job> object
+ * @param - input_file_path
+ * @param - callback
  **/
 
-exports.audio = function(j) {
-        var inFile = j.original_file_path
+exports.audio = function(inFile, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         var command = fluentffmpeg(inFile)
 
         .on('start', function(commandLine) {
             console.log('Command: ' + commandLine)
-            job.updateStatus(j.id, 'processing')
+            callback('processing');
         })
 
         .on('end', function(err, stdout, stderr) {
             if (err) {
                 console.log('ERROR ' + err)
-                job.updateStatus(j.id, 'error')
+                callback('error');
             } else {
                 console.log('SUCCESS');
-                //update status
-                job.updateStatus(j.id, 'completed', function() {
-                    //update bandwidth
-                    job.updateBandwidth(j.id, path.dirname(j.original_file_path), function() {
-                        //run callback
-                        callback(j)
-                    })
-                })
+                callback('success');
             }
-            // console.log(stdout)
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
-            // job.updateStatus(j.id, 'processing')
+            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            callback('processing');
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR occured when trying to encode audio #" + j.id);
+            console.log("ERROR for job #" + inFile);
             console.log(err);
-            job.updateStatus(j.id, 'error')
-                // console.log(stdout)
+            callback('error');
         })
+
 
         //mp3
         .output(outFile + '.mp3')
@@ -209,53 +173,44 @@ exports.audio = function(j) {
 /**
  * Generate thumbnails
  * output files are generated in same folder in which input file is present
- * @param - <job> object
+ * @param - input_file_path
+ * @param - callback
  **/
 
-exports.thumbnails = function(j) {
-        var inFile = j.original_file_path
+exports.thumbnails = function(inFile, thumb_count, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         var command = fluentffmpeg(inFile)
 
         .on('start', function(commandLine) {
             console.log('Command: ' + commandLine)
-            job.updateStatus(j.id, 'processing')
+            callback('processing');
         })
 
         .on('end', function(err, stdout, stderr) {
             if (err) {
                 console.log('ERROR ' + err)
-                job.updateStatus(j.id, 'error')
+                callback('error');
             } else {
                 console.log('SUCCESS');
-                //update status
-                job.updateStatus(j.id, 'completed', function() {
-                    //update bandwidth
-                    job.updateBandwidth(j.id, path.dirname(j.original_file_path), function() {
-                        //run callback
-                        callback(j)
-                    })
-                })
+                callback('success');
             }
-            // console.log(stdout)
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + j.id + 'Processing: ' + progress.percent.toFixed(2) + '% done');
-            // job.updateStatus(j.id, 'processing')
+            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            callback('processing');
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR occured when trying to generate thumbnail #" + j.id);
+            console.log("ERROR for job #" + inFile);
             console.log(err);
-            job.updateStatus(j.id, 'error')
-                // console.log(stdout)
+            callback('error');
         })
 
         //take screenshots
         .screenshots({
-                count: j.thumb_count,
+                count: thumb_count,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })
