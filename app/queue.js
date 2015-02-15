@@ -48,6 +48,9 @@ function processSingle(job, callback) {
 
 /**
  * Start Processing Encoding Job Queue
+ * TODO
+   ====
+   1. Use async. May be https://github.com/caolan/async#queue
  **/
 
 exports.processBatch = function(status, callback) {
