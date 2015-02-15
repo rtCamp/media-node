@@ -1,6 +1,13 @@
-/*********************************************************
-  Main App
-*********************************************************/
+/**
+    express rooutes
+
+    Usage:
+    ======
+
+    var app = require('./app.js');                  // create object
+
+    // app is express app. All express function are available on app
+**/
 
 /**
  * node.js requires
@@ -36,7 +43,7 @@ app.use(express.static(path.dirname(__dirname) + '/'));
 
 // Homepage should show video-upload form
 app.get('/', function(req, res) {
-    res.sendFile( path.dirname(__dirname) + '/form.html');
+    res.sendFile( path.dirname(__dirname) + '/app/form.html');
 })
 
 // status check
