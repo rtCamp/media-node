@@ -86,7 +86,7 @@ function rtHandleUpload(req, res) {
                     original_file: inFileName
                         //TODO: job-type support
                 }).then(function(job) {
-                    console.log("Saved new job with #ID = " + job.id);
+                    console.log("Created new job with #ID = " + job.id);
                     rtProcessQueue();
                 })
                 res.status(200);

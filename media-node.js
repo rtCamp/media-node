@@ -9,8 +9,7 @@ var formidable = require('formidable')
 var mv = require('mv')
 
 //local modules
-var dbjob = require('./app/db.js');
-var encode = require('./app/encode.js');
+var db = require('./app/db.js');
 var util = require('./app/util.js');
 var queue = require('./app/queue.js');
 var app = require('./app/app.js');
@@ -24,15 +23,19 @@ var config = require('./config.json')[env];
  **/
 // Upload video directly here
 app.post('/upload', function(req, res) {
-    rtHandleUpload(req, res); //handle upload
-    queue.process(); //start processing local job queue
+    rtHandleUpload(req, res, function(id){
+        console.log(id)
+    }); //handle upload
+    // queue.process(); //start processing local job queue
 })
 
 /**
- * Direct file upload form
+ * 1. Process upload form
+ * 2. Create database entry db.create
+ * 3. Send job for encoding queue.processSingle
  **/
 
-function rtHandleUpload(req, res) {
+function rtHandleUpload(req, res, callback) {
     var form = new formidable.IncomingForm();
 
     form.parse(req, function(err, fields, files) {
@@ -68,7 +71,7 @@ function rtHandleUpload(req, res) {
  **/
 
 function rtAddJobByFile(filename, fields) {
-        var format;
+        var format = fields.media_type;
 
         switch (fields.media_type) {
             case 'video':
@@ -93,12 +96,12 @@ function rtAddJobByFile(filename, fields) {
 
         console.log('Tryin to save new job ')
         console.log(newJob)
-            //create new job in DB
-        dbjob.create(newJob, function(job) {
+
+        //create new job in DB
+        db.create(newJob, function(job) {
             console.log("New job created")
-            console.log(job)
-            queue.encode(job.id, function() {
-                fireCallback(job)
+            queue.processSingle(job, function(s) {
+                console.log(s)
             })
         });
     } //end function
@@ -152,14 +155,14 @@ function fireCallback(job) {
     START Execution
 *********************************************************/
 
-dbjob.init(function() {
+db.init(function() {
         var server = app.listen(config.port, config.host, function() {
             var host = server.address().address
             var port = server.address().port
             console.log('Media-node is listening at http://%s:%s', host, port);
             util.makedir(config.folder); //make sure media storgae folders are present
-            queue.process(function(job) {
-                fireCallback(job)
-            }); //start processing local job queue
+            // queue.process(function(job) {
+            //     fireCallback(job)
+            // }); //start processing local job queue
         });
-    }) //end of dbjob
+    }) //end of db

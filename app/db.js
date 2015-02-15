@@ -103,7 +103,7 @@ exports.create = function(job, callback) {
                             function(res) {
                                 // console.log(res)
                                 console.log("Saved new job with #ID = " + res.id);
-                                // callback(res)
+                                callback(res)
                             })
                 })
         } else {

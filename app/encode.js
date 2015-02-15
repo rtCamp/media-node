@@ -6,7 +6,7 @@
 
     var encoder = require('./encode.js');                           // create object
 
-    encoder.video(input_file_path, callback)                        // update status for a job
+    encoder.video(input_file_path, thumb_count, callback)           // update status for a job
     encoder.audio(input_file_path, callback)                        // update bandwidth for a job
     encoder.thumbnails(input_file_path, thumb_count, callback)      // update duration for a job
 
@@ -36,7 +36,7 @@ var ffmpeg = fluentffmpeg();
  * @param - callback
  **/
 
-exports.video = function(inFile, callback) {
+exports.video = function(inFile, thumb_count, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         console.log("Tyring to encode video # " + inFile);
@@ -61,7 +61,7 @@ exports.video = function(inFile, callback) {
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
             callback('processing');
         })
 
@@ -140,7 +140,7 @@ exports.audio = function(inFile, callback) {
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
             callback('processing');
         })
 
@@ -198,7 +198,7 @@ exports.thumbnails = function(inFile, thumb_count, callback) {
         })
 
         .on('progress', function(progress) {
-            console.log('Job #' + inFile + 'Processing: ' + progress.percent.toFixed(2) + '% done');
+            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
             callback('processing');
         })
 
