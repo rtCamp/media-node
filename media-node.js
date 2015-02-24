@@ -101,7 +101,9 @@ function rtAddJobByFile(filename, fields) {
         db.create(newJob, function(job) {
             console.log("New job created")
             queue.processSingle(job, function(s) {
-                console.log(s)
+                if ( s == "status "){
+                    console.log(s)
+                }
             })
         });
     } //end function
