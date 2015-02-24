@@ -7,16 +7,17 @@
  **/
 var formidable = require('formidable')
 var mv = require('mv')
+var async = require('async')
 
 //local modules
-var db = require('./app/db.js');
-var util = require('./app/util.js');
-var queue = require('./app/queue.js');
-var app = require('./app/app.js');
+var db = require('./app/db.js')
+var util = require('./app/util.js')
+var queue = require('./app/queue.js')
+var app = require('./app/app.js')
 
 // config
-var env = process.env.NODE_ENV || 'development';
-var config = require('./config.json')[env];
+var env = process.env.NODE_ENV || 'development'
+var config = require('./config.json')[env]
 
 /**
  * Express route to handle HTTP POST file.
@@ -25,9 +26,7 @@ app.post('/upload', rtHandleUpload); //handle upload
 
 /**
  * rtHandleUpload - File upload handling
- * 1. Process upload form
- * 2. Create database entry db.create
- * 3. Send job for encoding queue.processSingle
+ *
  * @param  {object} req    HTTP request object with form fields
  * @param  {type} res      HTTP response object whose values we need to set
  * @return {type}          description
@@ -64,9 +63,11 @@ function rtHandleUpload(req, res) {
 *********************************************************/
 
 /**
- * Add new job to database based on input file path
- **/
-
+ * rtAddJobByFile - Add new job to database based on input file path
+ *
+ * @param  {string} filename    local filesystem path for input file
+ * @param  {object} fields      form fields
+ */
 function rtAddJobByFile(filename, fields) {
     var format = fields.mediatype;
 
@@ -97,22 +98,27 @@ function rtAddJobByFile(filename, fields) {
     //create new job in DB
     db.create(newJob, function(job) {
       console.log('New job created')
-      queue.processSingle(job, function(s) {
-        console.log(s)
-      })
+        //   queue.processSingle(job, function(s) {
+        //     console.log(s)
+        //   })
     });
   } //end function
 
 /**
- * Execute callback for given job id
+ *
  * @param job - <job> object
  **/
 
-function fireCallback(job) {
+/**
+ * fireCallback - Execute callback for given job
+ *
+ * @param  {object}     job     single job object
+ */
+function fireCallback(jobId) {
     output = {
       mediaid: job.apiJobId,
       status: job.status,
-      fileUrl: job.originalFileUrl,
+      fileUrl: job.originalFileUrl
     }
 
     //thumbnail loop
@@ -126,9 +132,11 @@ function fireCallback(job) {
           output['thumb_' + i++] = path.dirname(job.originalFilePath) + '/' + file
         }
       }) //end of inner loop
-    console.log('Executing callback for job # ' + job.id);
-    console.log('CALLBACK OUTPUT BELOW');
+
+    console.log('Dumping OUTPUT BELOW');
     console.log(output);
+
+    console.log('Executing callback for job # ' + job.id);
 
     request.post({
           url: job.callbackUrl,
@@ -146,18 +154,67 @@ function fireCallback(job) {
       ) //end of request.post
   } //end of rtAPIFireCallback
 
+function queueBatchCallback(err, status) {
+  if (err) {
+    callback('error', 'Error occured during batch processing')
+  } else {
+    callback(null, status + ' status batch processing completed successfully')
+  }
+}
+
+function processPending() {
+  queue.processBatch('queued', function() {
+      queue.processBatch('processing', function() {
+        console.log('pending jobs processed')
+      })
+    })
+}
+
 /*********************************************************
     START Execution
 *********************************************************/
 
 db.init(function() {
     var server = app.listen(config.port, config.host, function() {
-      var host = server.address()
-        .address
-      var port = server.address()
-        .port
-      console.log('Media-node is listening at http://%s:%s', host, port);
-      util.makedir(config.folder); //make sure media storgae folders are present
+      var host = server.address().address
+      var port = server.address().port
+      console.log('Media-node is listening at http://%s:%s', host, port)
+        //make sure media storgae folders are present
+      util.makedir(config.folder)
+      console.log('Processig pending jobs from last time')
+      processPending()
+      // async.series([
+      //     queue.processBatch('queued', queueBatchCallback),
+      //     queue.processBatch('processing', queueBatchCallback)
+      //   ],
+      //   // optional callback
+      //   function(err, results) {
+      //     console.log('callback is executed for async.series')
+      //     if (err) {
+      //       console.log(err)
+      //     }
+      //     console.log(results)
+      //   })
+      // var statusList = ['queued', 'processing']
+      // statusList.forEach(function(status) {
+      //   queue.processBatch(status, queueBatchCallback)
+      // })
+
+      // var q = async.queue(function(status, callback) {
+      //   queue.processBatch(status, queueBatchCallback)
+      //   callback();
+      // }, 1);
+      // // assign a callback
+      // q.drain = function() {
+      //   console.log('all pending jobs has been processed');
+      // }
+      // q.push('queued', function(err) {
+      //   console.log('finished jobs with status = queued');
+      // });
+      // q.push('processing', function(err) {
+      //   console.log('finished jobs with status = processing');
+      // });
+
       // queue.process(function(job) {
       //     fireCallback(job)
       // }); //start processing local job queue

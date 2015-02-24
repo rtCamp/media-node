@@ -37,80 +37,81 @@ var ffmpeg = fluentffmpeg();
  **/
 
 exports.video = function(inFile, thumbCount, callback) {
-        var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
+    var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        console.log('Tyring to encode video # ' + inFile);
-        console.log(inFile);
-        console.log(outFile);
+    console.log('Inside encoder :: Tyring to encode video # ' + inFile);
+    console.log(inFile);
+    console.log(outFile);
 
-        var command = fluentffmpeg(inFile)
+    var command = fluentffmpeg(inFile)
 
-        .on('start', function(commandLine) {
-            console.log('Command: ' + commandLine)
-            callback('processing');
-        })
+    .on('start', function(commandLine) {
+      // console.log('Command: ' + commandLine)
+      callback('processing');
+    })
 
-        .on('end', function(err, stdout, stderr) {
-            if (err) {
-                console.log('ERROR ' + err)
-                callback('error');
-            } else {
-                console.log('SUCCESS');
-                callback('success');
-            }
-        })
+    .on('end', function(err, stdout, stderr) {
+      if (err) {
+        console.log('Inside encoder :: \nERROR ' + err)
+        callback('error');
+      } else {
+        console.log('\nInside encoder :: SUCCESS');
+        callback('success');
+      }
+    })
 
-        .on('progress', function(progress) {
-            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
-            callback('processing');
-        })
+    .on('progress', function(progress) {
+      process.stdout.write('Job #' + inFile + ' Processing: ' + progress.percent.toFixed(2) + '% done\r');
+      // console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
+      callback('processing');
+    })
 
-        .on('error', function(err, stdout, stderr) {
-            console.log('ERROR for job #' + inFile);
-            console.log(err);
-            callback('error');
-        })
+    .on('error', function(err, stdout, stderr) {
+      console.log('Inside encoder :: ERROR for job #' + inFile);
+      console.log(err);
+      callback('error');
+    })
 
-        //mp4
-        .output(outFile + '.mp4')
-            .videoCodec('libx264')
-            .outputOptions(
-                '-profile:v', 'baseline',
-                '-preset', 'slower',
-                '-pix_fmt', 'yuv420p',
-                '-crf', '18'
-            )
-            .videoFilters('scale=trunc(in_w/2)*2:trunc(in_h/2)*2')
+    //mp4
+    .output(outFile + '.mp4')
+      .videoCodec('libx264')
+      .outputOptions(
+        '-profile:v', 'baseline',
+        '-preset', 'slower',
+        '-pix_fmt', 'yuv420p',
+        '-crf', '18'
+      )
+      .videoFilters('scale=trunc(in_w/2)*2:trunc(in_h/2)*2')
 
-        //webm
-        .output(outFile + '.webm')
-            .videoCodec('libvpx')
-            .audioCodec('libvorbis')
-            .outputOptions(
-                '-b:v', '2M',
-                '-quality', 'good',
-                '-pix_fmt', 'yuv420p',
-                '-crf', '5'
-            )
-            .videoFilters('scale=trunc(in_w/2)*2:trunc(in_h/2)*2')
+    //webm
+    .output(outFile + '.webm')
+      .videoCodec('libvpx')
+      .audioCodec('libvorbis')
+      .outputOptions(
+        '-b:v', '2M',
+        '-quality', 'good',
+        '-pix_fmt', 'yuv420p',
+        '-crf', '5'
+      )
+      .videoFilters('scale=trunc(in_w/2)*2:trunc(in_h/2)*2')
 
-        //ogv
-        .output(outFile + '.ogv')
-            .videoCodec('libtheora')
-            .audioCodec('libvorbis')
-            .outputOptions(
-                '-pix_fmt', 'yuv420p',
-                '-q', '5'
-            )
+    //ogv
+    .output(outFile + '.ogv')
+      .videoCodec('libtheora')
+      .audioCodec('libvorbis')
+      .outputOptions(
+        '-pix_fmt', 'yuv420p',
+        '-q', '5'
+      )
 
-        //take screenshots
-        .screenshots({
-                count: thumbCount,
-                folder: path.dirname(outFile),
-                filename: '%b-%i.png'
-            })
-            // .run(); //not needed
-    } //end of video
+    //take screenshots
+    .screenshots({
+        count: thumbCount,
+        folder: path.dirname(outFile),
+        filename: '%b-%i.png'
+      })
+      // .run(); //not needed
+  } //end of video
 
 /**
  * Encode audio to mp3 and ogg format.
@@ -120,55 +121,55 @@ exports.video = function(inFile, thumbCount, callback) {
  **/
 
 exports.audio = function(inFile, callback) {
-        var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
+    var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        var command = fluentffmpeg(inFile)
+    var command = fluentffmpeg(inFile)
 
-        .on('start', function(commandLine) {
-            console.log('Command: ' + commandLine)
-            callback('processing');
-        })
+    .on('start', function(commandLine) {
+      console.log('Command: ' + commandLine)
+      callback('processing');
+    })
 
-        .on('end', function(err, stdout, stderr) {
-            if (err) {
-                console.log('ERROR ' + err)
-                callback('error');
-            } else {
-                console.log('SUCCESS');
-                callback('success');
-            }
-        })
+    .on('end', function(err, stdout, stderr) {
+      if (err) {
+        console.log('ERROR ' + err)
+        callback('error');
+      } else {
+        console.log('SUCCESS');
+        callback('success');
+      }
+    })
 
-        .on('progress', function(progress) {
-            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
-            callback('processing');
-        })
+    .on('progress', function(progress) {
+      process.stdout.write('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done\r');
+      // console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
+      callback('processing');
+    })
 
-        .on('error', function(err, stdout, stderr) {
-            console.log('ERROR for job #' + inFile);
-            console.log(err);
-            callback('error');
-        })
+    .on('error', function(err, stdout, stderr) {
+      console.log('ERROR for job #' + inFile);
+      console.log(err);
+      callback('error');
+    })
 
+    //mp3
+    .output(outFile + '.mp3')
+      .audioCodec('libmp3lame')
+      .outputOptions(
+        '-q:a', '0',
+        '-map', '0:a:0'
+      )
 
-        //mp3
-        .output(outFile + '.mp3')
-            .audioCodec('libmp3lame')
-            .outputOptions(
-                '-q:a', '0',
-                '-map', '0:a:0'
-            )
+    //ogg
+    .output(outFile + '.ogv')
+      .audioCodec('libvorbis')
+      .outputOptions(
+        '-q:a', '0',
+        '-map', '0:a:0'
+      )
 
-        //ogg
-        .output(outFile + '.ogv')
-            .audioCodec('libvorbis')
-            .outputOptions(
-                '-q:a', '0',
-                '-map', '0:a:0'
-            )
-
-        .run(); //start actual work
-    } //end of audio
+    .run(); //start actual work
+  } //end of audio
 
 /**
  * Generate thumbnails
@@ -178,41 +179,41 @@ exports.audio = function(inFile, callback) {
  **/
 
 exports.thumbnails = function(inFile, thumbCount, callback) {
-        var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
+    var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        var command = fluentffmpeg(inFile)
+    var command = fluentffmpeg(inFile)
 
-        .on('start', function(commandLine) {
-            console.log('Command: ' + commandLine)
-            callback('processing');
-        })
+    .on('start', function(commandLine) {
+      console.log('Command: ' + commandLine)
+      callback('processing');
+    })
 
-        .on('end', function(err, stdout, stderr) {
-            if (err) {
-                console.log('ERROR ' + err)
-                callback('error');
-            } else {
-                console.log('SUCCESS');
-                callback('success');
-            }
-        })
+    .on('end', function(err, stdout, stderr) {
+      if (err) {
+        console.log('ERROR ' + err)
+        callback('error');
+      } else {
+        console.log('SUCCESS');
+        callback('success');
+      }
+    })
 
-        .on('progress', function(progress) {
-            console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
-            callback('processing');
-        })
+    .on('progress', function(progress) {
+      // console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
+      callback('processing');
+    })
 
-        .on('error', function(err, stdout, stderr) {
-            console.log('ERROR for job #' + inFile);
-            console.log(err);
-            callback('error');
-        })
+    .on('error', function(err, stdout, stderr) {
+      console.log('ERROR for job #' + inFile);
+      console.log(err);
+      callback('error');
+    })
 
-        //take screenshots
-        .screenshots({
-                count: thumbCount,
-                folder: path.dirname(outFile),
-                filename: '%b-%i.png'
-            })
-            // .run(); //not needed actual work
-    } //end of thumbnails
+    //take screenshots
+    .screenshots({
+        count: thumbCount,
+        folder: path.dirname(outFile),
+        filename: '%b-%i.png'
+      })
+      // .run(); //not needed actual work
+  } //end of thumbnails

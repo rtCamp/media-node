@@ -117,15 +117,17 @@ exports.create = function(job, callback) {
     }
   } //end of create
 
-
 /**
- * findJobsByStatus - Find all jobs with a particular status
+ * find - Find all jobs with a particular status
  *
  * @param  {string}     jobStatus      a valid status type
  * @param  {function}   callback       function to excute with database search results
  */
-exports.find = function findJobsByStatus(jobStatus, callback) {
-    console.log('Trying to find jobs with status : ' + jobStatus)
+exports.find = function(jobStatus, callback) {
+    if (typeof jobStatus === 'undefined') {
+      jobStatus = 'queued'
+    }
+    console.log('Inside db.find :: Trying to find jobs with status : ' + jobStatus)
     Job.findAll({
         where: {
           status: jobStatus
@@ -134,10 +136,11 @@ exports.find = function findJobsByStatus(jobStatus, callback) {
       .then(
         function(jobs) {
           // console.log(jobs)
+          console.log('Inside db.find :: Found ' + jobs.length + 'for status = ' + jobStatus)
           callback(jobs)
         }
       ).catch(function(error) {
-        console.log('Following ERROR occured During DB FIND operation')
+        console.log('Inside db.find :: Following ERROR occured')
         console.log(error)
       })
   } //end of find
@@ -155,7 +158,7 @@ exports.find = function findJobsByStatus(jobStatus, callback) {
  * @param  {string}     jobStatus       jobId job id which needs update
  * @param  {function}   callback        function to excute with database search results
  */
-exports.updateStatus = function updateStatusForJob(jobId, jobStatus, callback) {
+exports.updateStatus = function updateStatusForJob(jobId, jobStatus) {
     Job.update({
         status: jobStatus
       }, {
@@ -164,11 +167,11 @@ exports.updateStatus = function updateStatusForJob(jobId, jobStatus, callback) {
         }
       })
       .then(function() {
-        console.log('Status updated successfully for job #' + jobId);
-        callback()
+        console.log('Status updated successfully for job #' + jobId + ' with new status ' + jobStatus);
+        // callback(jobId, jobStatus)
       })
       .catch(function(err) {
-        console.log('Status update failed for job #' + jobId);
+        console.log('Status update failed for job #' + jobId + ' with new status ' + jobStatus);
       })
   } // end of upateStatus
 
