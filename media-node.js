@@ -63,6 +63,45 @@ function rtHandleUpload(req, res) {
     Other Functions
 *********************************************************/
 
+/**
+ * Add new job to database based on input file path
+ **/
+
+function rtAddJobByFile(filename, fields) {
+    var format = fields.mediatype;
+
+    switch (fields.mediatype) {
+    case 'video':
+      format: 'mp4';
+      break
+    case 'audio':
+      format: 'mp4';
+      break
+    case 'thumbs':
+      format: 'thumbnails';
+      break
+    }
+
+    var newJob = {
+      apiJobId: fields.mediaid,
+      originalFilePath: filename,
+      originalFileUrl: 'http://' + config.host + ':' + config.port + '/' + filename,
+      requestFormats: format,
+      callbackUrl: fields.callbackurl,
+      thumbCount: fields.thumbs
+    };
+
+    console.log('Tryin to save new job ')
+    console.log(newJob)
+
+    //create new job in DB
+    db.create(newJob, function(job) {
+      console.log('New job created')
+      queue.processSingle(job, function(s) {
+        console.log(s)
+      })
+    });
+  } //end function
 
 /**
  * Execute callback for given job id
@@ -73,7 +112,7 @@ function fireCallback(job) {
     output = {
       mediaid: job.apiJobId,
       status: job.status,
-      file_url: job.originalFileUrl,
+      fileUrl: job.originalFileUrl,
     }
 
     //thumbnail loop
@@ -82,7 +121,7 @@ function fireCallback(job) {
     var files = fs.readdirSync(path.dirname(job.originalFilePath));
     var i = 1;
 
-    files.forEach(function (file) {
+    files.forEach(function(file) {
         if (path.extname(file) === '.png') {
           output['thumb_' + i++] = path.dirname(job.originalFilePath) + '/' + file
         }
@@ -93,9 +132,9 @@ function fireCallback(job) {
 
     request.post({
           url: job.callbackUrl,
-          form: output,
+          form: output
         },
-        function (error, response, body) {
+        function(error, response, body) {
           if (!error && response.statusCode == 200) {
             // console.log(response)
             console.log('callback success')
@@ -107,15 +146,16 @@ function fireCallback(job) {
       ) //end of request.post
   } //end of rtAPIFireCallback
 
-
 /*********************************************************
     START Execution
 *********************************************************/
 
-db.init(function () {
-    var server = app.listen(config.port, config.host, function () {
-      var host = server.address().address
-      var port = server.address().port
+db.init(function() {
+    var server = app.listen(config.port, config.host, function() {
+      var host = server.address()
+        .address
+      var port = server.address()
+        .port
       console.log('Media-node is listening at http://%s:%s', host, port);
       util.makedir(config.folder); //make sure media storgae folders are present
       // queue.process(function(job) {

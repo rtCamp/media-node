@@ -22,5 +22,3 @@ exports.makedir = function(dir) {
     fs.mkdirSync(dir);
   }
 }
-
-exports.

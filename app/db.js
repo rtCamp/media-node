@@ -61,7 +61,7 @@ var Job = sequelize.define('Job', {
 exports.init = function(callback) {
   sequelize
     .sync()
-    .then(function () {
+    .then(function() {
       console.log('Database table ready!')
       callback()
     })
@@ -80,7 +80,7 @@ exports.init = function(callback) {
  * @param job.duration original video/audio duration
  **/
 
-exports.create = function (job, callback) {
+exports.create = function(job, callback) {
     //get file size
     if (typeof job.bandwidth === 'undefined') {
       var stats = fs.statSync(job.originalFilePath);
@@ -90,7 +90,7 @@ exports.create = function (job, callback) {
     //check duration
     if (typeof job.duration === 'undefined') {
       fluentffmpeg(job.originalFilePath)
-        .ffprobe(function (err, data) {
+        .ffprobe(function(err, data) {
           if (err) {
             console.log('ffprobe coudln\'t find correct duration so setting it to 0 (zero) ')
             job.duration = 0
@@ -100,7 +100,7 @@ exports.create = function (job, callback) {
           // console.log('Job duration is ' + job.duration)
           Job.create(job)
             .then(
-              function (res) {
+              function(res) {
                 // console.log(res)
                 console.log('Saved new job with #ID = ' + res.id);
                 callback(res)
@@ -109,7 +109,7 @@ exports.create = function (job, callback) {
     } else {
       Job.create(job)
         .then(
-          function (res) {
+          function(res) {
             // console.log(res)
             console.log('Saved new job with #ID = ' + res.id);
             callback(res)
@@ -167,7 +167,7 @@ exports.updateStatus = function updateStatusForJob(jobId, jobStatus, callback) {
         console.log('Status updated successfully for job #' + jobId);
         callback()
       })
-      .catch(function (err) {
+      .catch(function(err) {
         console.log('Status update failed for job #' + jobId);
       })
   } // end of upateStatus
@@ -178,9 +178,9 @@ exports.updateStatus = function updateStatusForJob(jobId, jobStatus, callback) {
  * @param job_bandwidth bandwidth in bytes used by this job
  **/
 
-exports.updateBandwidth = function (jobId, job_dir, callback) {
+exports.updateBandwidth = function(jobId, job_dir, callback) {
     console.log('Calculating the size of' + job_dir)
-    du(job_dir, function (err, size) {
+    du(job_dir, function(err, size) {
       console.log('The size of' + job_dir + ' is:', size, 'bytes')
       Job.update({
           bandwidth: size
@@ -189,7 +189,7 @@ exports.updateBandwidth = function (jobId, job_dir, callback) {
             id: jobId
           }
         })
-        .then(function () {
+        .then(function() {
           console.log('Bandwidth updated successfully for job #' + jobId);
           callback()
         })
@@ -204,9 +204,9 @@ exports.updateBandwidth = function (jobId, job_dir, callback) {
  * @param job_duration duration in seconds
  **/
 
-exports.updateDuration = function (jobId, job_file, callback) {
+exports.updateDuration = function(jobId, job_file, callback) {
     fluentffmpeg(job_file)
-      .ffprobe(function (err, data) {
+      .ffprobe(function(err, data) {
         if (err) {
           console.log(err)
         } else {
@@ -217,11 +217,11 @@ exports.updateDuration = function (jobId, job_file, callback) {
                 id: jobId
               }
             })
-            .then(function () {
+            .then(function() {
               console.log('Duration updated successfully for job #' + jobId);
               callback()
             })
-            .catch(function (err) {
+            .catch(function(err) {
               console.log('Duration update failed for job #' + jobId);
             })
         }
