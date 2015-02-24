@@ -2,7 +2,7 @@ var fluentffmpeg = require('fluent-ffmpeg')
 // var job = require('./db.js')
 var clone = require('clone');
 var path = require('path')
-var env = process.env.NODE_ENV || "development"
+var env = process.env.NODE_ENV || 'development'
 var config = require(__dirname + '/../config.json')[env]
 
 //instance of fluent-ffmpeg
@@ -33,7 +33,7 @@ ffmpeg.on('start', function(commandLine) {
 })
 
 .on('error', function(err, stdout, stderr) {
-    console.log("ERROR occured when trying to encode video");
+    console.log('ERROR occured when trying to encode video');
     console.log(err);
     ffmpeg.cb('Error on ' + this._inputs[0].source)
 })
@@ -49,7 +49,7 @@ ffmpeg.on('start', function(commandLine) {
 exports.video = function(inFile, thumbCount, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        console.log("Tyring to encode video @ " + inFile);
+        console.log('Tyring to encode video @ ' + inFile);
         console.log(outFile);
 
         // var command = fluentffmpeg(inFile)
@@ -112,7 +112,7 @@ exports.video = function(inFile, thumbCount, callback) {
 
 
 exports.audio = function(inFile, callback) {
-        // var inFile = j.original_file_path
+        // var inFile = j.originalFilePath
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         var command = ffmpeg;
@@ -150,7 +150,7 @@ exports.audio = function(inFile, callback) {
  **/
 
 exports.thumbnails = function(inFile, thumbCount, callback) {
-        // var inFile = j.original_file_path
+        // var inFile = j.originalFilePath
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         var command = ffmpeg;

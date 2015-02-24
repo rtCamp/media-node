@@ -16,7 +16,7 @@ var express = require('express')
 var path = require('path')
 
 // config
-var env = process.env.NODE_ENV || "development";
+var env = process.env.NODE_ENV || 'development';
 var config = require('./../config.json')[env];
 
 /**********************************************************

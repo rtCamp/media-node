@@ -18,7 +18,9 @@ var fs = require('fs')
  */
 
 exports.makedir = function(dir) {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir);
-    }
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
 }
+
+exports.

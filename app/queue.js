@@ -16,7 +16,7 @@ var encoder = require('./encode.js');
 
 /**
  * Encodes a single Job and updates database values for it.
- * Upon success, fires callback_url.
+ * Upon success, fires callbackUrl.
  * output files are generated in same folder in which input file is present
  * @param - job object
  * @param - callback
@@ -24,25 +24,25 @@ var encoder = require('./encode.js');
 
 function processSingle(job, callback) {
         console.log('Starting encoding ' + job.id)
-        switch (job.request_formats) {
+        switch (job.requestFormats) {
             case 'mp4':
                 console.log('video #' + job.id)
-                encoder.video(job.original_file_path, job.thumb_count, function(status) {
-                    console.log("New status for job # " + job.id + " is " + status)
+                encoder.video(job.originalFilePath, job.thumbCount, function(status) {
+                    console.log('New status for job # ' + job.id + ' is ' + status)
                 })
                 break
             case 'mp3':
-                encoder.audio(job.original_file_path, function(status) {
-                    console.log("New status for job # " + job.id + " is " + status)
+                encoder.audio(job.originalFilePath, function(status) {
+                    console.log('New status for job # ' + job.id + ' is ' + status)
                 })
                 break
             case 'thumbnails':
-                encoder.thumbnails(job.original_file_path, job.thumb_count, function(status) {
-                    console.log("New status for job # " + job.id + " is " + status)
+                encoder.thumbnails(job.originalFilePath, job.thumbCount, function(status) {
+                    console.log('New status for job # ' + job.id + ' is ' + status)
                 })
                 break
             default:
-                console.log("ERROR : request_formats is not set for Job #" + job.id)
+                console.log('ERROR : requestFormats is not set for Job #' + job.id)
         } //end of switch
     } //end of encode
 
@@ -56,7 +56,7 @@ function processSingle(job, callback) {
 exports.processBatch = function(status, callback) {
     console.log('Starting batch processing for job queue')
     db.find('queued', function(jobs) {
-            console.log("Found Jobs")
+            console.log('Found Jobs')
             jobs.forEach(
                 processSingle(job)            )
     })

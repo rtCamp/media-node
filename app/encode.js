@@ -6,9 +6,9 @@
 
     var encoder = require('./encode.js');                           // create object
 
-    encoder.video(input_file_path, thumb_count, callback)           // update status for a job
+    encoder.video(input_file_path, thumbCount, callback)           // update status for a job
     encoder.audio(input_file_path, callback)                        // update bandwidth for a job
-    encoder.thumbnails(input_file_path, thumb_count, callback)      // update duration for a job
+    encoder.thumbnails(input_file_path, thumbCount, callback)      // update duration for a job
 
     TODO
     =======
@@ -23,7 +23,7 @@ var fluentffmpeg = require('fluent-ffmpeg')
 var path = require('path')
 
 //config
-var env = process.env.NODE_ENV || "development"
+var env = process.env.NODE_ENV || 'development'
 var config = require(__dirname + '/../config.json')[env]
 
 //instance of fluent-ffmpeg
@@ -36,10 +36,10 @@ var ffmpeg = fluentffmpeg();
  * @param - callback
  **/
 
-exports.video = function(inFile, thumb_count, callback) {
+exports.video = function(inFile, thumbCount, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
-        console.log("Tyring to encode video # " + inFile);
+        console.log('Tyring to encode video # ' + inFile);
         console.log(inFile);
         console.log(outFile);
 
@@ -66,7 +66,7 @@ exports.video = function(inFile, thumb_count, callback) {
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR for job #" + inFile);
+            console.log('ERROR for job #' + inFile);
             console.log(err);
             callback('error');
         })
@@ -105,7 +105,7 @@ exports.video = function(inFile, thumb_count, callback) {
 
         //take screenshots
         .screenshots({
-                count: thumb_count,
+                count: thumbCount,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })
@@ -145,7 +145,7 @@ exports.audio = function(inFile, callback) {
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR for job #" + inFile);
+            console.log('ERROR for job #' + inFile);
             console.log(err);
             callback('error');
         })
@@ -177,7 +177,7 @@ exports.audio = function(inFile, callback) {
  * @param - callback
  **/
 
-exports.thumbnails = function(inFile, thumb_count, callback) {
+exports.thumbnails = function(inFile, thumbCount, callback) {
         var outFile = path.dirname(inFile) + '/' + path.basename(inFile, path.extname(inFile))
 
         var command = fluentffmpeg(inFile)
@@ -203,14 +203,14 @@ exports.thumbnails = function(inFile, thumb_count, callback) {
         })
 
         .on('error', function(err, stdout, stderr) {
-            console.log("ERROR for job #" + inFile);
+            console.log('ERROR for job #' + inFile);
             console.log(err);
             callback('error');
         })
 
         //take screenshots
         .screenshots({
-                count: thumb_count,
+                count: thumbCount,
                 folder: path.dirname(outFile),
                 filename: '%b-%i.png'
             })

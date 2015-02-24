@@ -15,7 +15,7 @@ var dbjob = require('./db.js')
 var util = require('./util.js')
 var queue = require('./queue.js')
     //
-var env = process.env.NODE_ENV || "development"
+var env = process.env.NODE_ENV || 'development'
 var config = require(__dirname + '/../config.json')[env]
 
 /**
@@ -23,7 +23,7 @@ var config = require(__dirname + '/../config.json')[env]
  **/
 
 exports.getjobs = function(callback) {
-        request(config.apiserver + "/server/" + config.apiserverid + '/getjobs', function(error, response, body) {
+        request(config.apiserver + '/server/' + config.apiserverid + '/getjobs', function(error, response, body) {
                 if (!error && response.statusCode == 200) {
                     var parsed = JSON.parse(body);
                     if (parsed.jobs) {
@@ -31,7 +31,7 @@ exports.getjobs = function(callback) {
                             rtAddJobByURL(job, callback)
                         })
                     } else {
-                        console.log("API has no pending jobs at the moment")
+                        console.log('API has no pending jobs at the moment')
                     }
                 } else {
                     console.log(error);
@@ -47,17 +47,17 @@ exports.getjobs = function(callback) {
  **/
 
 exports.updatejob = function(job_id, field_name, field_value, callback) {
-        var apiurl = config.apiserver + "server/" + config.apiserverid + "/update/" + job_id + "/?field_name=" + field_name + "&field_value=" + field_value;
+        var apiurl = config.apiserver + 'server/' + config.apiserverid + '/update/' + job_id + '/?field_name=' + field_name + '&field_value=' + field_value;
 
-        console.log("HIT " + apiurl);
+        console.log('HIT ' + apiurl);
 
         request(apiurl, function(error, response, body) {
                 if (!error && response.statusCode == 200) {
                     // console.log(body)
-                    console.log(field_name + " updated with value " + field_value)
+                    console.log(field_name + ' updated with value ' + field_value)
                     callback()
                 } else {
-                    console.log("Failed");
+                    console.log('Failed');
                     // console.log(error);
                     // console.log(response)
                 }
@@ -71,28 +71,28 @@ exports.updatejob = function(job_id, field_name, field_value, callback) {
 
 exports.callback = function(job) {
         output = {
-            id: job.api_job_id,
-            file_id: job.api_job_id,
-            file_url: job.original_file_url,
+            id: job.apiJobId,
+            file_id: job.apiJobId,
+            file_url: job.originalFileUrl,
             status: job.status,
-            file_name: path.basename(job.original_file_path),
-            file_path: job.original_file_path,
-            apikey: job.api_key_id,
+            file_name: path.basename(job.originalFilePath),
+            file_path: job.originalFilePath,
+            apikey: job.apiKeyId,
         }
 
         //thumbnail loop
-        console.log("Opening Dir " + path.dirname(job.original_file_path))
+        console.log('Opening Dir ' + path.dirname(job.originalFilePath))
 
-        var files = fs.readdirSync(path.dirname(job.original_file_path));
+        var files = fs.readdirSync(path.dirname(job.originalFilePath));
         var i = 1;
 
         files.forEach(function(file) {
-                if (path.extname(file) === ".png") {
-                    output['thumb_' + i++] = path.dirname(job.original_file_path) + '/' + file
+                if (path.extname(file) === '.png') {
+                    output['thumb_' + i++] = path.dirname(job.originalFilePath) + '/' + file
                 }
             }) //end of inner loop
-        console.log("Executing callback for job # " + job.id);
-        console.log("CALLBACK OUTPUT BELOW");
+        console.log('Executing callback for job # ' + job.id);
+        console.log('CALLBACK OUTPUT BELOW');
         console.log(output);
 
         request.post({
@@ -102,9 +102,9 @@ exports.callback = function(job) {
                 function(error, response, body) {
                     if (!error && response.statusCode == 200) {
                         // console.log(response)
-                        console.log("callback success")
+                        console.log('callback success')
                     } else {
-                        console.log("callback failed")
+                        console.log('callback failed')
                         console.log(error);
                     }
                 } //end of function
@@ -120,7 +120,7 @@ exports.callback = function(job) {
  **/
 
 function rtAddJobByURL(job, callback) {
-        console.log("START: Add job by URL called for Job # " + job.id)
+        console.log('START: Add job by URL called for Job # ' + job.id)
 
         //set a local filename
         var filename = url.parse(job.input_file_url).pathname.split('/').pop();
@@ -140,29 +140,29 @@ function rtAddJobByURL(job, callback) {
                         file.end();
                         console.log('Downloaded ' + filepath);
                         dbjob.create({
-                            api_job_id: job.id,
-                            api_key_id: job.apikey_id,
-                            original_file_path: filepath,
-                            original_file_url: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
-                            request_formats: job.request_formats,
-                            thumb_count: job.thumbs,
+                            apiJobId: job.id,
+                            apiKeyId: job.apikey_id,
+                            originalFilePath: filepath,
+                            originalFileUrl: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
+                            requestFormats: job.requestFormats,
+                            thumbCount: job.thumbs,
                             bandwidth: job.bandwidth,
-                            callback_url: job.callback_url,
+                            callbackUrl: job.callbackUrl,
                         }, callback);
                     });
                 }) //end of http.get
         } else {
             //save new job to database
             dbjob.create({
-                api_job_id: job.id,
-                api_key_id: job.apikey_id,
-                original_file_path: filepath,
-                original_file_url: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
-                request_formats: job.request_formats,
-                thumb_count: job.thumbs,
+                apiJobId: job.id,
+                apiKeyId: job.apikey_id,
+                originalFilePath: filepath,
+                originalFileUrl: 'http://' + config.host + ':' + config.port + '/' + path.normalize(filepath),
+                requestFormats: job.requestFormats,
+                thumbCount: job.thumbs,
                 bandwidth: job.bandwidth,
-                callback_url: job.callback_url,
+                callbackUrl: job.callbackUrl,
             }, callback);
-            console.log("END: File already exists for # " + job.id)
+            console.log('END: File already exists for # ' + job.id)
         }
     } //end of function rtAddJobByURL
