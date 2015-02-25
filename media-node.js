@@ -164,8 +164,9 @@ function queueBatchCallback(err, status) {
 
 function processPending() {
   queue.processBatch('queued', function() {
+      console.log('Inside processPending :: queued jobs done')
       queue.processBatch('processing', function() {
-        console.log('pending jobs processed')
+        console.log('Inside processPending :: processing jobs done')
       })
     })
 }
@@ -182,19 +183,23 @@ db.init(function() {
         //make sure media storgae folders are present
       util.makedir(config.folder)
       console.log('Processig pending jobs from last time')
-      processPending()
-      // async.series([
-      //     queue.processBatch('queued', queueBatchCallback),
-      //     queue.processBatch('processing', queueBatchCallback)
-      //   ],
-      //   // optional callback
-      //   function(err, results) {
-      //     console.log('callback is executed for async.series')
-      //     if (err) {
-      //       console.log(err)
-      //     }
-      //     console.log(results)
-      //   })
+      // processPending()
+      async.series([
+          function(callback) {
+            queue.processBatch('queued', callback)
+          },
+          function(callback) {
+            queue.processBatch('processing', callback)
+          }
+        ],
+        // optional callback
+        function(err, results) {
+          console.log('callback is executed for async.series')
+          if (err) {
+            console.log(err)
+          }
+          console.log(results)
+        })
       // var statusList = ['queued', 'processing']
       // statusList.forEach(function(status) {
       //   queue.processBatch(status, queueBatchCallback)

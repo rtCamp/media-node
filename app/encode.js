@@ -55,15 +55,15 @@ exports.video = function(inFile, thumbCount, callback) {
         console.log('Inside encoder :: \nERROR ' + err)
         callback('error');
       } else {
-        console.log('\nInside encoder :: SUCCESS');
-        callback('success');
+        console.log('\nInside encoder :: COMPLETED');
+        callback('completed');
       }
     })
 
     .on('progress', function(progress) {
-      process.stdout.write('Job #' + inFile + ' Processing: ' + progress.percent.toFixed(2) + '% done\r');
-      // console.log('Job #' + inFile + '\n Processing: ' + progress.percent.toFixed(2) + '% done');
-      callback('processing');
+      // process.stdout.write('Job #' + inFile + ' Processing: ' + progress.percent.toFixed(2) + '% done\r');
+      console.log('Job #' + inFile + ' Processing: ' + progress.percent.toFixed(2) + '% done');
+      // callback('processing');
     })
 
     .on('error', function(err, stdout, stderr) {

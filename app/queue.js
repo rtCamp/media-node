@@ -32,13 +32,19 @@ var processSingle = function processSingle(job, callback) {
     console.log('Starting encoding ' + job.id)
     switch (job.requestFormats) {
     case 'mp4':
-      encoder.video(job.originalFilePath, job.thumbCount, db.updateStatus(job.id, status))
+      encoder.video(job.originalFilePath, job.thumbCount, function(status) {
+        db.updateStatus(job.id, status)
+      })
       break
     case 'mp3':
-      encoder.audio(job.originalFilePath, db.updateStatus(job.id, status))
+      encoder.audio(job.originalFilePath, function(status) {
+        db.updateStatus(job.id, status)
+      })
       break
     case 'thumbnails':
-      encoder.thumbnails(job.originalFilePath, job.thumbCount, db.updateStatus(job.id, status))
+      encoder.thumbnails(job.originalFilePath, job.thumbCount, function(status) {
+        db.updateStatus(job.id, status)
+      })
       break
     default:
       console.log('ERROR : requestFormats is not set for Job #' + job.id)
@@ -58,25 +64,35 @@ exports.processBatch = function(status, callback) {
   db.find(status, function(jobs) {
     if (jobs.length === 0) {
       console.log('There are no pending jobs with status ' + status)
+      callback(null, 'There are no pending jobs with status ' + status)
       return
     }
-    console.log('Found Jobs ' + jobs.length + ' with status ' + status)
+    console.log('Inside processBatch :: Found ' + jobs.length + ' Jobs with status ' + status)
 
-    jobs.forEach(function(job) {
-      processSingle(job, function() {
-        console.log('Inside queue.processSingle :: job' + job.id + 'finished')
-      })
-    })
-
-    // async.eachSeries(jobs, processSingle, function(err) {
-    //   if (err) {
-    //     console.log('Error occured during batch processing')
-    //     console.log(err)
-    //   } else {
-    //     console.log(status + ' status batch processing completed successfully')
-    //   }
-    //   callback()
+    // jobs.forEach(function(job) {
+    //   console.log(job.id + ' ' + job.status + ' ' + job.originalFilePath)
+    //   processSingle(job, function() {
+    //     console.log('Inside queue.processSingle :: job' + job.id + 'finished')
+    //     callback(null, 'Inside queue.processSingle :: job' + job.id + 'finished')
+    //   })
     // })
+
+    async.eachSeries(jobs, function(job, cb) {
+        processSingle(job, function() {
+          console.log('Inside queue.processSingle :: job' + job.id + 'finished')
+          cb()
+        })
+        // callback(null, 'Inside queue.processSingle :: job' + job.id + 'finished')
+      }, function(err) {
+        if (err) {
+          console.log('Error occured during batch processing')
+          console.log(err)
+          callback(null, 'Error occured during batch processing')
+        } else {
+          console.log(status + ' status batch processing completed successfully')
+          callback(null, 'Inside queue.processSingle :: job' + job.id + 'finished')
+        }
+      })//end of async
   })
 }
 
