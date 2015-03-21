@@ -183,7 +183,7 @@ db.init(function() {
         //make sure media storgae folders are present
       util.makedir(config.folder)
       console.log('Processig pending jobs from last time')
-      // processPending()
+      processPending()
       async.series([
           function(callback) {
             queue.processBatch('queued', callback)
