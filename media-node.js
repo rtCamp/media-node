@@ -69,7 +69,7 @@ function rtHandleUpload(req, res) {
  * @param  {object} fields      form fields
  */
 function rtAddJobByFile(filename, fields) {
-    var fileformat = fields.media_type;
+    fileformat = fields.media_type;
 
     switch (fields.media_type) {
     case 'video':
@@ -83,7 +83,7 @@ function rtAddJobByFile(filename, fields) {
       break
     }
 
-    var newJob = {
+    newJob = {
       apiJobId: fields.mediaid,
       originalFilePath: filename,
       originalFileUrl: 'http://' + config.host + ':' + config.port + '/' + filename,
