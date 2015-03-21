@@ -3,6 +3,12 @@ media-node
 
 A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-media 
 
+## Install
+
+```
+npm install formidable connect sqlite3
+```
+
 ## API
 
 > Note: Replace IP:PORT when running following commands
