@@ -69,17 +69,17 @@ function rtHandleUpload(req, res) {
  * @param  {object} fields      form fields
  */
 function rtAddJobByFile(filename, fields) {
-    var format = fields.mediatype;
+    var fileformat = fields.media_type;
 
-    switch (fields.mediatype) {
+    switch (fields.media_type) {
     case 'video':
-      format: 'mp4';
+      fileformat: 'mp4';
       break
     case 'audio':
-      format: 'mp4';
+      fileformat: 'mp3';
       break
     case 'thumbs':
-      format: 'thumbnails';
+      fileformat: 'thumbnails';
       break
     }
 
@@ -87,7 +87,7 @@ function rtAddJobByFile(filename, fields) {
       apiJobId: fields.mediaid,
       originalFilePath: filename,
       originalFileUrl: 'http://' + config.host + ':' + config.port + '/' + filename,
-      requestFormats: format,
+      requestFormats: fileformat,
       callbackUrl: fields.callbackurl,
       thumbCount: fields.thumbs
     };
