@@ -112,7 +112,7 @@ fi
 
 if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
 then
-	cat /etc/apt/sources.list | grep multiverse &> /dev/null
+	cat /etc/apt/sources.list | grep "^[^#]*multiverse$" &> /dev/null
 	if [ $? -eq 0 ]
 	then
 		echo -e "\033[34m Already Multiverse Reporitory Enabled... \e[0m"
