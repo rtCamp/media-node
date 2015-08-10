@@ -454,11 +454,11 @@ cd $MNDIR
 #git clone git://github.com/rtCamp/media-node.git
 #cd media-node
 echo -e "\033[34m Installing Formidable Node Module... \e[0m"
-npm install formidable || OwnError "Unable To Install Formidable Node Module :("
+sudo npm install formidable || OwnError "Unable To Install Formidable Node Module :("
 echo -e "\033[34m Installing Connect Node Module... \e[0m"
-npm install connect || OwnError "Unable To Install Connect Node Module :("
+sudo npm install connect || OwnError "Unable To Install Connect Node Module :("
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
-npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
+sudo npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
 
 # Copy Media Node Files
 #clear
