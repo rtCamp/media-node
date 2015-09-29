@@ -1,5 +1,6 @@
 var formidable = require('formidable'),//For form handling
 http = require('http'), //For creating http server required by connect framework
+https = require('https'), //For creating https request to callback url
 connect = require('connect'), //For creating the server for serving static files as well as status of the server
 util = require('util'), //Inspecting elements for debugging and showing server status
 fs = require('fs'), //For moving files around and handling uploads
@@ -523,7 +524,13 @@ function send_callback(callback_url,output){
         }
     };
 
-    var req = http.request(options, function(res) {
+    if( callback.protocol == 'https:' ){
+        var req_func = https;
+    }else{
+        var req_func = http;
+    }
+    
+    var req = req_func.request(options, function(res) {
         //console.log('STATUS: ' + res.statusCode);
         //console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
@@ -531,6 +538,7 @@ function send_callback(callback_url,output){
             console.log('Servers reply on callback: ' + chunk);
         });
     });
+    
     req.on('error', function(e) {
         console.log('problem with request: ' + e.message);
     });
