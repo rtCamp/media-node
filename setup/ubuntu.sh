@@ -7,6 +7,7 @@
 #	4. Ubuntu 11.04 Desktop/Server
 #	5. Ubuntu 11.10 Desktop/Server
 #	6. Ubuntu 12.04 Desktop/Server
+#	7. Ubuntu 14.04 Desktop/Server
 
 
 #pwd | grep setup &> /dev/null
@@ -61,6 +62,8 @@ cat /etc/lsb-release | grep 11.10 &> /dev/null
 Ubuntu1110=$(echo $?)
 cat /etc/lsb-release | grep 12.04 &> /dev/null
 Ubuntu1204=$(echo $?)
+cat /etc/lsb-release | grep 14.04 &> /dev/null
+Ubuntu1404=$(echo $?)
 
 if [ $Ubuntu804 -eq 0 ]
 then
@@ -80,6 +83,9 @@ then
 elif [ $Ubuntu1204 -eq 0 ]
 then
 	Version=Ubuntu1204
+elif [ $Ubuntu1404 -eq 0 ]
+then
+	Version=Ubuntu1404
 else
 	Version=Ubuntu1204
 fi
@@ -104,15 +110,15 @@ elif [ $Version = Ubuntu1004 ]
 then
 	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
 	sudo apt-get -y remove ffmpeg x264 libx264-dev yasm libmp3lame-dev
-elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
 	echo -e "\033[34m Removing Unwanted Softwares From $Version... \e[0m"
 	sudo apt-get -y remove ffmpeg x264 libav-tools libvpx-dev libx264-dev
 fi
 
-if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
-	cat /etc/apt/sources.list | grep multiverse &> /dev/null
+	cat /etc/apt/sources.list | grep "^[^#]*multiverse$" &> /dev/null
 	if [ $? -eq 0 ]
 	then
 		echo -e "\033[34m Already Multiverse Reporitory Enabled... \e[0m"
@@ -167,12 +173,12 @@ then
 		nasm libsdl1.2-dev \
 		|| OwnError "$Version Server Installation Failed :("
 	fi
-elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
 	if [ $DesktopDetect -eq 0 ]
 	then
 
-		# Ubuntu10.10 11.04 11.10 12.04  Desktop
+		# Ubuntu10.10 11.04 11.10 12.04 14.04 Desktop
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libjack-jackd2-dev libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev \
@@ -181,7 +187,7 @@ then
 		|| OwnError "$Version Desktop Installation Failed :("
 	else
 
-		# Ubuntu10.10 11.04 11.10 12.04 Servers
+		# Ubuntu10.10 11.04 11.10 12.04 14.04 Servers
 		echo -e "\033[34m  Installing Packages For $Version Desktop \e[0m"
 		sudo apt-get -y install autoconf build-essential checkinstall git libfaac-dev libgpac-dev \
 		libmp3lame-dev libopencore-amrnb-dev libopencore-amrwb-dev librtmp-dev libtheora-dev \
@@ -242,9 +248,9 @@ then
 	sudo checkinstall --pkgname=x264 --default --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
 	|| OwnError "Unable To Install x264 For $Version :("
-elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
-	# Ubuntu 10.10 11.04 11.10 12.04 
+	# Ubuntu 10.10 11.04 11.10 12.04 14.04
 	echo -e "\033[34m Installing x264 For $Version \e[0m"
 	sudo checkinstall --pkgname=x264 --pkgversion="3:$(./version.sh | \
 	awk -F'[" ]' '/POINT/{print $4"+git"$5}')" --backup=no --deldoc=yes \
@@ -295,8 +301,8 @@ fi
 
 
 # Install AAC (fdk-aac) Audio Encoder
-# AAC Is Recommended For Ubuntu 10.10/11.04/11.10/12.04
-if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+# AAC Is Recommended For Ubuntu 10.10/11.04/11.10/12.04/14.04
+if [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
 	clear
 	cd $MNDIR
@@ -319,9 +325,9 @@ echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
 if [ $Version = Ubuntu804 ]
 then
 	git clone https://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
-elif [ $Version = Ubuntu 1004 ] || [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu 1004 ] || [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
-	git clone --depth 1 http://git.chromium.org/webm/libvpx.git || OwnError "Unable To Clonning VP8 Repository For $Version :("
+	git clone --depth 1 https://chromium.googlesource.com/webm/libvpx/ || OwnError "Unable To Clonning VP8 Repository For $Version :("
 fi
 cd libvpx
 ./configure || OwnError "Unable To Configure VP8 :("
@@ -382,7 +388,7 @@ then
 	--deldoc=yes --default \
 	|| OwnError "Unable To Install FFmpeg For $Version :("
 
-elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ]
+elif [ $Version = Ubuntu1010 ] || [ $Version = Ubuntu1104 ] || [ $Version = Ubuntu1110 ] || [ $Version = Ubuntu1204 ] || [ $Version = Ubuntu1404 ]
 then
 	if [ $DesktopDetect -eq 0 ]
 	then
@@ -448,11 +454,11 @@ cd $MNDIR
 #git clone git://github.com/rtCamp/media-node.git
 #cd media-node
 echo -e "\033[34m Installing Formidable Node Module... \e[0m"
-npm install formidable || OwnError "Unable To Install Formidable Node Module :("
+sudo npm install formidable || OwnError "Unable To Install Formidable Node Module :("
 echo -e "\033[34m Installing Connect Node Module... \e[0m"
-npm install connect || OwnError "Unable To Install Connect Node Module :("
+sudo npm install connect || OwnError "Unable To Install Connect Node Module :("
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
-npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
+sudo npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module :("
 
 # Copy Media Node Files
 #clear
