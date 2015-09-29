@@ -1,5 +1,6 @@
 var formidable = require('formidable'),//For form handling
 http = require('http'), //For creating http server required by connect framework
+https = require('https'), //For creating https request to callback url
 connect = require('connect'), //For creating the server for serving static files as well as status of the server
 util = require('util'), //Inspecting elements for debugging and showing server status
 fs = require('fs'), //For moving files around and handling uploads
@@ -130,7 +131,8 @@ function queueHandler() {
         var filename = current_file.filename.split(".");
         console.log('File info : ' + filename);
 
-        var basename = filename[0];
+        var filename_ext_index = current_file.filename.lastIndexOf(".");
+        var basename = current_file.filename.substring( 0, filename_ext_index );
         console.log('Filename without extension : '+basename);
         
         if (filename.length>1) {
@@ -523,14 +525,27 @@ function send_callback(callback_url,output){
         }
     };
 
-    var req = http.request(options, function(res) {
-        //console.log('STATUS: ' + res.statusCode);
-        //console.log('HEADERS: ' + JSON.stringify(res.headers));
-        res.setEncoding('utf8');
-        res.on('data', function (chunk) {
-            console.log('Servers reply on callback: ' + chunk);
+    if( callback.protocol == 'https:' ){
+        var req = https.request(options, function(res) {
+            //console.log('STATUS: ' + res.statusCode);
+            //console.log('HEADERS: ' + JSON.stringify(res.headers));
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('Servers reply on callback: ' + chunk);
+            });
         });
-    });
+    } else {
+        var req = http.request(options, function(res) {
+            //console.log('STATUS: ' + res.statusCode);
+            //console.log('HEADERS: ' + JSON.stringify(res.headers));
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('Servers reply on callback: ' + chunk);
+            });
+        });    
+    }
+
+    
     req.on('error', function(e) {
         console.log('problem with request: ' + e.message);
     });
