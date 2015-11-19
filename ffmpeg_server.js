@@ -1,5 +1,6 @@
 var formidable = require('formidable'),//For form handling
 http = require('http'), //For creating http server required by connect framework
+https = require('https'), //For creating https request to callback url
 connect = require('connect'), //For creating the server for serving static files as well as status of the server
 util = require('util'), //Inspecting elements for debugging and showing server status
 fs = require('fs'), //For moving files around and handling uploads
@@ -72,6 +73,8 @@ function reQueueFiles(){
 		vid.filename = row.original_file;
 		vid.status = 1;
 		vid.output_type = row.output_type;
+        vid.start_time = row.start_time;
+        vid.end_time = row.end_time;
 		queue.push(vid);
 	});
 }
@@ -143,10 +146,18 @@ function queueHandler() {
         }
         
         console.log('Processing ==> '+ current_file.filename);
+
+        var trim_str = '';
+        if( typeof current_file.start_time != 'undefined' ){
+            trim_str += ' -ss ' + current_file.start_time;
+        }
+        if( typeof current_file.end_time != 'undefined' && current_file.end_time != '00:00:00' ){
+            trim_str += ' -t ' + current_file.end_time;
+        }
         
         if(current_file.output_type == 1){
             filename = basename + '.mp4';
-            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet -r 24 -vcodec libx264 -vprofile high -preset slow -vf scale=640:480 -b:v 1500k -maxrate 100k -bufsize 200k -pix_fmt yuv420p -threads 1 -acodec libfaac -b:a 128k "' + temp_folder + filename + '"';
+            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' ' + trim_str + ' -loglevel quiet -r 24 -vcodec libx264 -vprofile high -preset slow -vf scale=640:480 -b:v 1500k -maxrate 100k -bufsize 200k -pix_fmt yuv420p -threads 1 -acodec libfaac -b:a 128k "' + temp_folder + filename + '"';
             var commands = new Array();
             var thumbs = new Array();
             var interval;
@@ -166,7 +177,7 @@ function queueHandler() {
         }
         else if(current_file.output_type == 2){
             filename = basename + '.mp3';
-            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' -loglevel quiet  "' + temp_folder + filename + '"';
+            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' ' + trim_str + ' -loglevel quiet  "' + temp_folder + filename + '"';
         }
         else{
             console.log('=================================');
@@ -244,9 +255,13 @@ function queueHandler() {
  * 2:	Audio(MP3)
  **/
 db.serialize(function() {
-    db.run("CREATE TABLE IF NOT EXISTS transactions (transaction_id INTEGER PRIMARY KEY AUTOINCREMENT, creation_date INTEGER, original_file TEXT, status INT, output_type INT, transcoded_file TEXT, callback_url TEXT, duration INT NULL DEFAULT NULL, thumbs INT NULL DEFAULT NULL)");
-    db_run_error_handler('ALTER TABLE transactions ADD COLUMN duration INT NULL;');
+    db.run("CREATE TABLE IF NOT EXISTS transactions (transaction_id INTEGER PRIMARY KEY AUTOINCREMENT, creation_date INTEGER, original_file TEXT, status INT, output_type INT, transcoded_file TEXT, callback_url TEXT, duration INT NULL DEFAULT NULL, thumbs INT NULL DEFAULT NULL, start_time TEXT DEFAULT '00:00:00', end_time TEXT DEFAULT '00:00:00')");
+    db_run_error_handler('ALTER TABLE transactions ADD COLUMN duration INT NULL;')
     db_run_error_handler('ALTER TABLE transactions ADD COLUMN thumbs INT NULL;');
+
+    // add start_time and end_time columns
+    db_run_error_handler("ALTER TABLE transactions ADD COLUMN start_time TEXT DEFAULT '00:00:00';")
+    db_run_error_handler("ALTER TABLE transactions ADD COLUMN end_time TEXT DEFAULT '00:00:00';")
 });
 
 //Prevent server from crashing due to errors
@@ -336,16 +351,16 @@ function generate_thumbs(commands, thumbs, start, end, callback_url, output){
     
 }
 
-function insert_transaction(filename,status,output_type,callback_url,res,duration,thumbs){
+function insert_transaction(filename,status,output_type,callback_url,res,duration,thumbs, start_time, end_time){
     var vid = new Object;
     db.serialize(function() {
         if(typeof callback_url !== undefined){
             if(output_type == 1) {
-                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url,duration,thumbs) VALUES (strftime('%s','now'),?,?,?,?,?,?)");
+                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url,start_time,end_time,duration,thumbs) VALUES (strftime('%s','now'),?,?,?,?,?,?,?,?)");
             } else {
-                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url) VALUES (strftime('%s','now'),?,?,?,?)");
+                var stmt = db.prepare("INSERT INTO transactions (creation_date,output_type,original_file,status,callback_url,start_time,end_time) VALUES (strftime('%s','now'),?,?,?,?)");
             }
-            stmt.run(output_type,filename,status,callback_url);
+            stmt.run(output_type,filename,status,callback_url, start_time, end_time);
             vid.callback_url = callback_url;
         }
         else{
@@ -366,6 +381,8 @@ function insert_transaction(filename,status,output_type,callback_url,res,duratio
                         vid.duration = duration;
                         vid.thumbs = thumbs;
                     }
+                    vid.start_time = start_time;
+                    vid.end_time = end_time;
                     vid = update_transaction_status(vid,1);
                     queue.push(vid);
                     var output = {};
@@ -433,16 +450,16 @@ connect()
                         }
                         if (error !== null) {
                             console.log('Execution error: ' + error);
-                            insert_transaction(newname+'.'+ext,6,output_type,res,parseInt(fields.duration),parseInt(fields.thumbs));
+                            insert_transaction(newname+'.'+ext,6,output_type,res,parseInt(fields.duration),parseInt(fields.thumbs), fields.start_time, fields.end_time);
                         }
                         else{
                             console.log(queued_folder + newname + '.' + ext + ' added to the queue');
                             console.log(queue);
                             if(typeof(fields.callback_url)!==undefined){
-                                insert_transaction(newname+'.'+ext,0,output_type,fields.callback_url,res, parseInt(fields.duration),parseInt(fields.thumbs));
+                                insert_transaction(newname+'.'+ext,0,output_type,fields.callback_url,res, parseInt(fields.duration),parseInt(fields.thumbs), fields.start_time, fields.end_time);
                             }
                             else{
-                                insert_transaction(newname+'.'+ext,0,output_type,res, fields.duration,fields.thumbs);
+                                insert_transaction(newname+'.'+ext,0,output_type,res, fields.duration,fields.thumbs, fields.start_time, fields.end_time);
                             }
                         }
                     });
@@ -523,7 +540,13 @@ function send_callback(callback_url,output){
         }
     };
 
-    var req = http.request(options, function(res) {
+    if( callback.protocol == 'https:' ){
+        var req_func = https;
+    }else{
+        var req_func = http;
+    }
+    
+    var req = req_func.request(options, function(res) {
         //console.log('STATUS: ' + res.statusCode);
         //console.log('HEADERS: ' + JSON.stringify(res.headers));
         res.setEncoding('utf8');
@@ -531,6 +554,7 @@ function send_callback(callback_url,output){
             console.log('Servers reply on callback: ' + chunk);
         });
     });
+    
     req.on('error', function(e) {
         console.log('problem with request: ' + e.message);
     });
