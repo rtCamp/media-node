@@ -6,6 +6,8 @@ A node.js wrapper for ffmpeg. Made for https://github.com/rtCamp/buddypress-medi
 ## Install
 
 ```
+sudo apt-get install libcurl4-openssl-dev build-essential
+sudo npm install -g node-gyp
 npm install formidable connect sqlite3
 ```
 
