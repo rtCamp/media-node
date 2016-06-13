@@ -85,12 +85,12 @@ make install || OwnError "Unable To Install YASM"
 clear
 cd $MNDIR
 echo -e "\033[34m Cloning x264 Repo... \e[0m"
-git clone git://git.videolan.org/x264 || OwnError "Unable To Clonning x264 Repository"
+git clone http://git.videolan.org/git/x264.git || OwnError "Unable To Clonning x264 Repository"
 cd x264
 ./configure --enable-shared --enable-static || OwnError "Unable To Configure x264"
 make
 echo -e "\033[34m Installing x264 \e[0m"
-make install || OwnError "Unable To Install x264"
+make install
 
 
 
@@ -140,7 +140,7 @@ make install || OwnError "Unable To Install Libvorbis"
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning VP8 Repo... \e[0m"
-git clone http://git.chromium.org/webm/libvpx.git \
+git clone https://chromium.googlesource.com/webm/libvpx \
 || OwnError "Unable To Clonning VP8 Repository"
 cd libvpx
 git checkout v1.3.0 || OwnError "Unable To checkout VP8 v1.3.0"
@@ -167,8 +167,8 @@ make install || OwnError "Unable To Install Zlib"
 clear
 cd $MNDIR
 echo -e "\033[34m  Cloning FFmpeg Repo... \e[0m"
-git clone git://source.ffmpeg.org/ffmpeg || OwnError "Unable To Clonning FFmpeg Repository"
-cd ffmpeg
+git clone https://github.com/FFmpeg/FFmpeg.git || OwnError "Unable To Clonning FFmpeg Repository"
+cd FFmpeg
 ./configure --enable-gpl --enable-libmp3lame --enable-libvorbis --enable-libvpx --enable-libx264 --enable-libfaac --enable-nonfree \
 || OwnError "Unable To Configure FFmpeg"
 make
@@ -214,13 +214,10 @@ npm -v || OwnError "NPM Is Not Properly Installed"
 # Clonning The Media-Node Repository
 clear
 cd $MNDIR
-#echo -e "\033[34m Clonning Media Node Repository... \e[0m"
-#git clone git://github.com/rtCamp/media-node.git
-#cd media-node
 echo -e "\033[34m Installing Formidable Node Module... \e[0m"
 npm install formidable || OwnError "Unable To Install Formidable Node Module"
 echo -e "\033[34m Installing Connect Node Module... \e[0m"
-npm install connect || OwnError "Unable To Install Connect Node Module"
+npm install connect@2.4.x || OwnError "Unable To Install Connect Node Module"
 echo -e "\033[34m Installing Sqlite3 Node Module... \e[0m"
 npm install sqlite3 || OwnError "Unable To Install Sqlite3 Node Module"
 
@@ -234,6 +231,9 @@ cd /tmp
 git clone git://github.com/rtCamp/media-node.git
 cp -rv  media-node/* $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
 cp -rv  media-node/.git $MNDIR/ || OwnError "Unable To Copy Media Node Files :("
+#cd $MNDIR
+#echo -e "\033[34m NPM update... \e[0m"
+#npm install || OwnError "Unable To NPM update"
 
 # Fix libx264.so.x
 echo "/usr/local/lib" >> /etc/ld.so.conf.d/media-node.conf || OwnError "Unable To Set Library For Media-Node"
