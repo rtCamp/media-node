@@ -157,7 +157,9 @@ function queueHandler() {
         
         if(current_file.output_type == 1){
             filename = basename + '.mp4';
-            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' ' + trim_str + ' -loglevel quiet -r 24 -vcodec libx264 -vprofile high -preset slow -vf scale=640:480 -b:v 1500k -maxrate 100k -bufsize 200k -pix_fmt yuv420p -threads 1 -acodec libfaac -b:a 128k "' + temp_folder + filename + '"';
+
+            // Command to convert video.
+            var command = 'ffmpeg -i ' + queued_folder + current_file.filename + ' ' + trim_str + ' -c:v libx264 -preset medium -crf 28 -c:a copy ' + temp_folder + filename + ' 2>ffmpeg_vid.log';
             var commands = new Array();
             var thumbs = new Array();
             var interval;
