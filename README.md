@@ -3,6 +3,8 @@ media-node
 
 A node.js wrapper for ffmpeg. Made for https://github.com/rtmediawp/rtmedia
 
+<a href="https://rtcamp.com/?utm_source=github&utm_medium=readme" rel="nofollow"><img src="https://rtcamp.com/wp-content/uploads/2019/04/github-banner@2x.png" alt="Handcrafted Enterprise WordPress Solutions by rtCamp" /></a>
+
 ## Install
 
 ```
