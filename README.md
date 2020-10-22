@@ -1,3 +1,7 @@
+# ⚠️ This project is achieved and replaced by https://rtmedia.io/transcoder/
+
+__________________________________________
+
 media-node
 ===========
 
